@@ -1,0 +1,121 @@
+# CyrodiilMP gitignore
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor and IDE files
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# Environment and local config
+.env
+.env.*
+*.local
+*.secrets.json
+appsettings.*.local.json
+
+# .NET / C#
+bin/
+obj/
+TestResults/
+*.nupkg
+*.snupkg
+*.vsp
+*.vspx
+*.coverage
+*.coveragexml
+coverage/
+*.trx
+
+# Project-local .NET/NuGet cache
+.dotnet-home/
+
+# CMake / native builds
+build/
+out/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+compile_commands.json
+*.ilk
+*.lib
+*.exp
+*.pdb
+*.idb
+*.obj
+*.o
+*.dll
+*.exe
+
+# Rust, if we prototype anything in Rust later
+target/
+Cargo.lock
+
+# Node/TypeScript, if launcher or tooling is added later
+node_modules/
+dist/
+.next/
+.vite/
+*.tsbuildinfo
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Logs, crash dumps, captures, profiling output
+*.log
+*.dmp
+*.mdmp
+*.etl
+*.evtx
+captures/
+profiling/
+research/net-smoke/
+
+# Generated research data
+research/game-inventory/inventory-*.json
+research/game-inventory/inventory-*.md
+research/runs/*/logs/
+research/runs/*/dumps/
+research/runs/*/screenshots/
+
+# Downloaded third-party tools stay local
+tools/**
+!tools/
+!tools/README.md
+
+# Unreal Engine / cooked game content / mod package outputs
+Saved/
+Intermediate/
+DerivedDataCache/
+Binaries/
+Plugins/*/Intermediate/
+Plugins/*/Binaries/
+*.pak
+*.ucas
+*.utoc
+*.umap
+*.uasset
+*.ushaderbytecode
+*.usmap
+*.sig
+
+# Oblivion Remastered / local game artifacts
+*.ess
+*.obse
+*.bak
+*.ini.local
+*.save
+
+# Release/package outputs
+release/
+releases/
+packages/
+artifacts/
