@@ -8,6 +8,8 @@ Use the `.cmd` wrappers when double-clicking from Explorer. They keep the window
 
 Starts a small local web dashboard for inspecting research runs and launching the full research pass.
 
+On the first run, the launcher will restore NuGet packages automatically if the dashboard project has not been restored yet.
+
 ```powershell
 .\scripts\run-dashboard.cmd -Port 5088
 ```
@@ -189,11 +191,14 @@ Output goes to `research/runs/`. The helper creates `README.md`, `notes.md`, and
 
 Starts the first dedicated server listener. It accepts LiteNetLib clients with the connection key `CyrodiilMP` and logs connects, disconnects, and raw packet previews.
 
+Like the dashboard launcher, this script now restores NuGet packages automatically on the first run if needed.
+
 ```powershell
 .\scripts\run-server.cmd -Port 27015
 ```
 
 This is intentionally just a listener for early client experiments. It does not perform transform replication yet.
+It now replies to the bridge `hello` with a simple `server-welcome` packet and replies to `menu-connect` with `menu-connect-ack`, so the first smoke test is a real round-trip handshake.
 
 ## Build Everything
 
@@ -221,9 +226,13 @@ Tests the same bridge behavior without launching the game.
 .\scripts\run-client-bridge.cmd -HostName 127.0.0.1 -Port 27015 -Name ManualBridge
 ```
 
+Like the other .NET helper launchers, this script restores NuGet packages automatically on the first run if needed.
+
 ## Run The Probe Client
 
 Sends fake transform packets to the data-capture server so we can verify connection and packet logging before the Oblivion Remastered client integration exists.
+
+This launcher also restores NuGet packages automatically on the first run if needed.
 
 In one terminal:
 

@@ -1,4 +1,4 @@
-local dumpDelayMs = 15000
+local autoDumpDelaysMs = { 120000 }
 local dumpDirName = "CyrodiilMP_RuntimeDumps"
 
 local function safe_tostring(value)
@@ -107,8 +107,6 @@ local function dump_functions_for_class(class_name)
 end
 
 local function dump_runtime()
-    os.execute("mkdir " .. dumpDirName)
-
     local summary = {}
     table.insert(summary, "# CyrodiilMP Runtime Inspector")
     table.insert(summary, "")
@@ -163,17 +161,11 @@ end
 
 print("[CyrodiilMP_RuntimeInspector] Loaded. Runtime dumps run automatically; console commands are optional.")
 
-ExecuteWithDelay(dumpDelayMs, function()
-    run_scheduled_dump("15 second")
-end)
-
-ExecuteWithDelay(45000, function()
-    run_scheduled_dump("45 second")
-end)
-
-ExecuteWithDelay(90000, function()
-    run_scheduled_dump("90 second")
-end)
+for _, delayMs in ipairs(autoDumpDelaysMs) do
+    ExecuteWithDelay(delayMs, function()
+        run_scheduled_dump(tostring(math.floor(delayMs / 1000)) .. " second")
+    end)
+end
 
 RegisterProcessConsoleExecPreHook(function(Context, Cmd, CommandParts, Ar, Executor)
     local command = safe_tostring(Cmd):lower()

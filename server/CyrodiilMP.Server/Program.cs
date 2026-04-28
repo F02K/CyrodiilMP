@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Net;
 using CyrodiilMP.Protocol;
 using LiteNetLib;
@@ -11,6 +12,7 @@ var server = new NetManager(listener)
     AutoRecycle = true,
     IPv6Enabled = false
 };
+var welcomedPeers = new HashSet<int>();
 
 listener.ConnectionRequestEvent += request =>
 {
@@ -30,6 +32,7 @@ listener.PeerConnectedEvent += peer =>
 
 listener.PeerDisconnectedEvent += (peer, info) =>
 {
+    welcomedPeers.Remove(peer.Id);
     Console.WriteLine($"{Now()} disconnected peer={peer.Id} reason={info.Reason}");
 };
 
@@ -43,6 +46,31 @@ listener.NetworkReceiveEvent += (peer, reader, channel, method) =>
     var payload = reader.GetRemainingBytes();
     var preview = Convert.ToHexString(payload.AsSpan(0, Math.Min(payload.Length, 32)));
     var text = CyrodiilProtocol.DecodePreview(payload);
+
+    var message = CyrodiilProtocol.ParseMessage(payload);
+    if (message is not null)
+    {
+        if (message.Verb.Equals("hello", StringComparison.OrdinalIgnoreCase))
+        {
+            if (welcomedPeers.Add(peer.Id))
+            {
+                peer.Send(
+                    CyrodiilProtocol.CreateServerWelcome(peer.Id, CyrodiilProtocol.DefaultServerTickRate),
+                    DeliveryMethod.ReliableOrdered);
+                Console.WriteLine(
+                    $"{Now()} welcome-sent peer={peer.Id} name={message.Get("name", "unknown")} source={message.Get("source", "unknown")}");
+            }
+        }
+        else if (message.Verb.Equals("menu-connect", StringComparison.OrdinalIgnoreCase))
+        {
+            peer.Send(
+                CyrodiilProtocol.CreateMenuConnectAck(peer.Id, "received"),
+                DeliveryMethod.ReliableOrdered);
+            Console.WriteLine(
+                $"{Now()} menu-connect peer={peer.Id} name={message.Get("name", "unknown")} reason={message.Get("reason", "unknown")}");
+        }
+    }
+
     Console.WriteLine(
         $"{Now()} packet peer={peer.Id} bytes={payload.Length} channel={channel} method={method} preview={preview} text=\"{text}\"");
 

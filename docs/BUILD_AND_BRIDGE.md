@@ -41,6 +41,8 @@ This installs:
 - UE4SS Lua mods into `OblivionRemastered\Binaries\Win64\Mods`
 - `CyrodiilMP.ClientBridge.exe` into `OblivionRemastered\Binaries\Win64\CyrodiilMP\ClientBridge`
 
+If the game path is correct but the `Mods` or `CyrodiilMP\ClientBridge` folders do not exist yet, the installer now creates them automatically.
+
 ## MVP Flow
 
 1. Start the dedicated server:
@@ -59,6 +61,13 @@ This installs:
    menu-connect name=OblivionMenu reason=<click reason>
    ```
 
-6. The bridge writes `client-bridge-result.json` in `CyrodiilMP_MenuProbe`.
+6. The server responds with:
 
-This is still not the final in-process client. It is the clean first bridge from UI click to server packet.
+   ```text
+   server-welcome player=<peer id> tick_rate=15 protocol=0
+   menu-connect-ack player=<peer id> status=received
+   ```
+
+7. The bridge writes `client-bridge-result.json` in `CyrodiilMP_MenuProbe`.
+
+This is still not the final in-process client. It is the clean first bridge from UI click to real round-trip server communication.
