@@ -18,6 +18,7 @@ The first playable milestone is intentionally small:
 
 - `docs/` - design notes, tool choices, architecture decisions.
 - `research/` - reverse engineering notes, UE5 runtime notes, packet/state sync experiments.
+- `client/` - short-lived client bridge launched from UE4SS for the first connect MVP.
 - `game-plugin/` - Remastered-side mod/plugin assets, UE project notes, pak/mod packaging experiments.
 - `native/` - native C/C++ code for hooks, UE5 SDK integration, memory integration, or launcher helpers.
 - `server/` - authoritative multiplayer server prototype.
@@ -30,12 +31,16 @@ The first playable milestone is intentionally small:
 Use the helper scripts to collect initial UE5/game-folder data without modifying the game install:
 
 ```powershell
+.\scripts\run-dashboard.cmd -Port 5088
 .\scripts\quick-scan.cmd -GamePath "D:\SteamLibrary\steamapps\common\Oblivion Remastered"
+.\scripts\full-research.cmd -GamePath "D:\SteamLibrary\steamapps\common\Oblivion Remastered"
 .\scripts\open-fmodel.cmd
 .\scripts\new-research-run.cmd -Name "first-fmodel-pass"
+.\scripts\index-fmodel-export.cmd -ExportPath "D:\FModelExports\OblivionMenu" -Name main-menu-pass
+.\scripts\install-cyrodiilmp-ue4ss-mods.cmd
 ```
 
-See `scripts/README.md` for the full helper list.
+See `scripts/README.md` for the full helper list and `docs/BUILD_AND_BRIDGE.md` for the organized build/client-bridge flow.
 
 ## License And Rights
 

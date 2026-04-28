@@ -21,6 +21,8 @@ Desktop.ini
 *.local
 *.secrets.json
 appsettings.*.local.json
+game-path.txt
+game-path.local.txt
 
 # .NET / C#
 bin/
@@ -39,7 +41,8 @@ coverage/
 .dotnet-home/
 
 # CMake / native builds
-build/
+build/*
+!build/*.ps1
 out/
 cmake-build-*/
 CMakeFiles/
@@ -82,6 +85,11 @@ research/net-smoke/
 # Generated research data
 research/game-inventory/inventory-*.json
 research/game-inventory/inventory-*.md
+research/dashboard-runtime/
+research/fmodel-index/
+research/full-research/
+research/runtime-dumps/
+research/sample-fmodel-export/
 research/runs/*/logs/
 research/runs/*/dumps/
 research/runs/*/screenshots/

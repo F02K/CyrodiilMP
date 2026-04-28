@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CyrodiilMP Inspector</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>CyrodiilMP Inspector</h1>
+      <p id="project-root"></p>
+    </div>
+    <button id="refresh-button" class="icon-button" title="Refresh data" type="button">R</button>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <section class="panel">
+        <h2>Research</h2>
+        <label for="game-path">Game Path</label>
+        <input id="game-path" type="text" autocomplete="off">
+        <div class="actions">
+          <button id="run-full-button" type="button">Run Full Research</button>
+        </div>
+        <div id="job-status" class="status idle">Idle</div>
+      </section>
+
+      <section class="panel">
+        <h2>Runs</h2>
+        <div id="runs" class="run-list"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Runtime Dumps</h2>
+        <div class="actions">
+          <button id="analyze-runtime-button" type="button" disabled>Analyze Selected Dump</button>
+        </div>
+        <div id="runtime-dumps" class="run-list"></div>
+      </section>
+    </aside>
+
+    <section class="content">
+      <div class="metrics">
+        <div class="metric">
+          <span>Total Files</span>
+          <strong id="metric-total">-</strong>
+        </div>
+        <div class="metric">
+          <span>UE Packages</span>
+          <strong id="metric-packages">-</strong>
+        </div>
+        <div class="metric">
+          <span>Legacy Data</span>
+          <strong id="metric-legacy">-</strong>
+        </div>
+      </div>
+
+      <nav id="tabs" class="tabs" aria-label="Files">
+        <button class="tab active" data-file="report.md" type="button">Report</button>
+        <button class="tab" data-file="packages.csv" type="button">Packages</button>
+        <button class="tab" data-file="legacy-data.csv" type="button">Legacy Data</button>
+        <button class="tab" data-file="executables-and-dlls.csv" type="button">Binaries</button>
+        <button class="tab" data-file="ini-summary.csv" type="button">INI</button>
+        <button class="tab" data-file="largest-files.csv" type="button">Largest</button>
+        <button class="tab" data-file="layout.csv" type="button">Layout</button>
+      </nav>
+
+      <section id="viewer" class="viewer">
+        <div class="empty">Select a research run or runtime dump.</div>
+      </section>
+
+      <section class="panel log-panel">
+        <h2>Job Log</h2>
+        <pre id="job-log"></pre>
+      </section>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

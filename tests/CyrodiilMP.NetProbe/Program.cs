@@ -1,8 +1,8 @@
-using System.Text;
+using CyrodiilMP.Protocol;
 using LiteNetLib;
 
-var host = GetOption(args, "--host", "127.0.0.1");
-var port = int.Parse(GetOption(args, "--port", "27015"));
+var host = GetOption(args, "--host", CyrodiilProtocol.DefaultHost);
+var port = int.Parse(GetOption(args, "--port", CyrodiilProtocol.DefaultPort.ToString()));
 var name = GetOption(args, "--name", "ProbePlayer");
 
 var listener = new EventBasedNetListener();
@@ -32,7 +32,7 @@ listener.NetworkErrorEvent += (endpoint, error) =>
 };
 
 client.Start();
-client.Connect(host, port, "CyrodiilMP");
+client.Connect(host, port, CyrodiilProtocol.ConnectionKey);
 
 Console.WriteLine($"{Now()} connecting as {name}");
 Console.WriteLine("Press Ctrl+C to stop.");
@@ -55,8 +55,7 @@ while (running)
         var y = MathF.Cos(tick * 0.1f) * 100.0f;
         var z = 0.0f;
         var yaw = (tick * 5) % 360;
-        var payload = Encoding.UTF8.GetBytes(
-            $"transform name={name} tick={tick} x={x:0.00} y={y:0.00} z={z:0.00} yaw={yaw}");
+        var payload = CyrodiilProtocol.CreateTransform(name, tick, x, y, z, yaw);
 
         peer.Send(payload, DeliveryMethod.Unreliable);
         Console.WriteLine($"{Now()} sent fake transform tick={tick}");

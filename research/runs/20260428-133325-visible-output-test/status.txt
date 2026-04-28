@@ -1,0 +1,6 @@
+﻿CyrodiilMP research run created successfully.
+Name: visible-output-test
+Created: 2026-04-28T13:33:25.7625147+02:00
+Path: E:\Github\CyrodiilMP\research\runs\20260428-133325-visible-output-test
+
+Next: open notes.md and record what you are testing.

@@ -1,0 +1,312 @@
+:root {
+  color-scheme: dark;
+  --bg: #111315;
+  --panel: #1b1f23;
+  --panel-2: #232931;
+  --text: #edf0f2;
+  --muted: #9aa5ad;
+  --line: #343b44;
+  --accent: #67d0a3;
+  --accent-2: #73a7ff;
+  --danger: #ff7d7d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 72px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line);
+  background: #15181b;
+}
+
+h1, h2 {
+  margin: 0;
+  font-weight: 650;
+}
+
+h1 {
+  font-size: 22px;
+}
+
+h2 {
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  min-height: calc(100vh - 72px);
+}
+
+.sidebar {
+  border-right: 1px solid var(--line);
+  background: #15181b;
+  padding: 16px;
+  overflow: auto;
+}
+
+.content {
+  padding: 16px;
+  overflow: auto;
+}
+
+.panel {
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+input {
+  width: 100%;
+  height: 38px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #101214;
+  color: var(--text);
+}
+
+button {
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel-2);
+  color: var(--text);
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--accent);
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.icon-button {
+  width: 38px;
+  font-size: 18px;
+}
+
+.actions {
+  margin-top: 10px;
+}
+
+.actions button {
+  width: 100%;
+}
+
+.status {
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  background: #101214;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.status.running {
+  color: var(--accent-2);
+}
+
+.status.completed {
+  color: var(--accent);
+}
+
+.status.failed {
+  color: var(--danger);
+}
+
+.run-list {
+  display: grid;
+  gap: 8px;
+}
+
+.run-item {
+  width: 100%;
+  height: auto;
+  padding: 10px;
+  text-align: left;
+}
+
+.run-item.active {
+  border-color: var(--accent);
+}
+
+.run-id {
+  display: block;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.run-meta {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.metric {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.metric span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 24px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+}
+
+.tab {
+  flex: 0 0 auto;
+  padding: 0 12px;
+}
+
+.tab.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.viewer {
+  min-height: 420px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  overflow: auto;
+}
+
+.empty {
+  padding: 28px;
+  color: var(--muted);
+}
+
+.empty.compact {
+  padding: 10px 0;
+  font-size: 13px;
+}
+
+.markdown {
+  padding: 18px 22px;
+  line-height: 1.5;
+}
+
+.markdown h1 {
+  margin-bottom: 14px;
+}
+
+.markdown h2 {
+  margin-top: 22px;
+  margin-bottom: 8px;
+  color: var(--accent);
+}
+
+.markdown li {
+  margin-bottom: 5px;
+}
+
+.markdown code {
+  color: var(--accent-2);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th, td {
+  max-width: 520px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background: var(--panel-2);
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.log-panel {
+  margin-top: 12px;
+}
+
+pre {
+  margin: 0;
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+  color: #cbd3d8;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+}
