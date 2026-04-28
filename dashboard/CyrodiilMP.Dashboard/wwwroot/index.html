@@ -1,9 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CyrodiilMP Dashboard</title>
+  <script>
+    (() => {
+      try {
+        const savedTheme = window.localStorage.getItem("cyrodiilmp-dashboard-theme");
+        document.documentElement.dataset.theme = savedTheme === "light" ? "light" : "dark";
+      } catch {
+        document.documentElement.dataset.theme = "dark";
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -18,6 +28,10 @@
         <p id="project-root" class="hero__path"></p>
       </div>
       <div class="hero__actions">
+        <button id="theme-toggle-button" class="ghost-button theme-toggle" type="button" aria-label="Switch to light mode" aria-pressed="true">
+          <span class="theme-toggle__label">Theme</span>
+          <strong id="theme-toggle-value" class="theme-toggle__value">Dark Mode</strong>
+        </button>
         <button id="refresh-button" class="primary-button" type="button">Refresh State</button>
       </div>
     </header>

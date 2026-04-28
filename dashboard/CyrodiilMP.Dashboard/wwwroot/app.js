@@ -1,3 +1,5 @@
+const THEME_STORAGE_KEY = "cyrodiilmp-dashboard-theme";
+
 const scopeConfig = {
   inventory: {
     listKey: "inventories",
@@ -28,6 +30,7 @@ const scopeConfig = {
 const state = {
   dashboard: null,
   detail: null,
+  theme: readInitialTheme(),
   selection: {
     scope: "",
     id: "",
@@ -41,6 +44,8 @@ const state = {
 const els = {
   projectRoot: document.querySelector("#project-root"),
   flashMessage: document.querySelector("#flash-message"),
+  themeToggleButton: document.querySelector("#theme-toggle-button"),
+  themeToggleValue: document.querySelector("#theme-toggle-value"),
   refreshButton: document.querySelector("#refresh-button"),
   inventoryCount: document.querySelector("#inventory-count"),
   fullResearchCount: document.querySelector("#full-research-count"),
@@ -94,6 +99,7 @@ const els = {
   selectionFacts: document.querySelector("#selection-facts")
 };
 
+els.themeToggleButton?.addEventListener("click", () => toggleTheme());
 els.refreshButton.addEventListener("click", () => refreshState({ reloadSelection: true, silent: false }));
 els.saveGamePathButton.addEventListener("click", () => saveGamePath());
 els.installUe4ssButton.addEventListener("click", () => installUe4ssMods());
@@ -116,6 +122,7 @@ els.serverStopButton.addEventListener("click", () => stopServer());
 els.serverForceStopButton.addEventListener("click", () => forceStopServer());
 els.bridgeRunButton.addEventListener("click", () => runBridgeSmoke());
 els.cancelJobButton.addEventListener("click", () => cancelCurrentJob());
+applyTheme(state.theme, { persist: false });
 
 async function refreshState({ reloadSelection = false, silent = true } = {}) {
   if (state.refreshInFlight) {
@@ -148,6 +155,43 @@ async function refreshState({ reloadSelection = false, silent = true } = {}) {
     }
   } finally {
     state.refreshInFlight = false;
+  }
+}
+
+function readInitialTheme() {
+  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
+}
+
+function toggleTheme() {
+  applyTheme(state.theme === "dark" ? "light" : "dark");
+}
+
+function applyTheme(theme, { persist = true } = {}) {
+  const nextTheme = theme === "light" ? "light" : "dark";
+  const nextLabel = nextTheme === "dark" ? "Dark Mode" : "Light Mode";
+  const targetLabel = nextTheme === "dark" ? "light" : "dark";
+
+  state.theme = nextTheme;
+  document.documentElement.dataset.theme = nextTheme;
+
+  if (els.themeToggleValue) {
+    els.themeToggleValue.textContent = nextLabel;
+  }
+
+  if (els.themeToggleButton) {
+    els.themeToggleButton.setAttribute("aria-label", `Switch to ${targetLabel} mode`);
+    els.themeToggleButton.setAttribute("aria-pressed", String(nextTheme === "dark"));
+    els.themeToggleButton.title = `Switch to ${targetLabel} mode`;
+  }
+
+  if (!persist) {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+  } catch {
+    // Ignore storage failures and keep the in-memory theme active.
   }
 }
 
