@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(CYRODIILMP_BUILD_UE4SS_GAMEHOST "Build UE4SS C++ GameHost mod" OFF)
 
 add_subdirectory(CyrodiilMP.GameClient)
+add_subdirectory(CyrodiilMP.Bootstrap)
+add_subdirectory(CyrodiilMP.Launcher)
 
 if(NOT CYRODIILMP_BUILD_UE4SS_GAMEHOST)
     message(STATUS "Skipping UE4SS GameHost. Set CYRODIILMP_BUILD_UE4SS_GAMEHOST=ON to build it.")
