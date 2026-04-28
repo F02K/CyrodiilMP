@@ -127,3 +127,4 @@ release/
 releases/
 packages/
 artifacts/
+/.claude

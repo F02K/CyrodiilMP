@@ -1,7 +1,8 @@
 param(
     [string]$GamePath,
     [switch]$IncludeAutoUSMAP,
-    [switch]$SkipClientBridgePublish
+    [switch]$SkipClientBridgePublish,
+    [switch]$SkipNativePlugin
 )
 
 $ErrorActionPreference = 'Stop'
@@ -21,8 +22,9 @@ if (-not (Test-Path -LiteralPath $targetModsPath -PathType Container)) {
 }
 
 $modsToInstall = @(
-    'CyrodiilMP_RuntimeInspector',
-    'CyrodiilMP_ConnectButtonPrototype'
+    'CyrodiilMP_RuntimeInspector'
+    # CyrodiilMP_ConnectButtonPrototype is retired — replaced by the native plugin.
+    # Re-add it here only if you need the Lua prototype for debugging.
 )
 
 if ($IncludeAutoUSMAP) {
@@ -56,6 +58,26 @@ if (-not $SkipClientBridgePublish) {
     Write-Host "Installed CyrodiilMP.ClientBridge -> $targetBridgePath"
 }
 
+# ── Native plugin (CyrodiilMP.GameHost DLL mod) ───────────────────────────────
+if (-not $SkipNativePlugin) {
+    $nativeModName   = 'CyrodiilMP.GameHost'
+    $nativeSourceDir = Join-Path $projectRoot "game-plugin\UE4SS\Mods\$nativeModName"
+    $nativeTargetDir = Join-Path $targetModsPath $nativeModName
+    $nativeDll       = Join-Path $nativeSourceDir 'dlls\main.dll'
+
+    if (-not (Test-Path -LiteralPath $nativeDll -PathType Leaf)) {
+        Write-Warning "Native plugin DLL not found at $nativeDll"
+        Write-Warning "Build it first: cd native && cmake --preset release && cmake --build build/release --config Release"
+        Write-Warning "Skipping native plugin installation."
+    } else {
+        New-Item -ItemType Directory -Path (Join-Path $nativeTargetDir 'dlls') -Force | Out-Null
+        Copy-Item -Path $nativeDll -Destination (Join-Path $nativeTargetDir 'dlls\main.dll') -Force
+        Write-Host "Installed $nativeModName -> $nativeTargetDir"
+        $modsToInstall += $nativeModName
+    }
+}
+
+# ── Update enabled.txt ────────────────────────────────────────────────────────
 if (-not (Test-Path -LiteralPath $enabledPath -PathType Leaf)) {
     New-Item -ItemType File -Path $enabledPath -Force | Out-Null
 }
@@ -68,19 +90,22 @@ foreach ($modName in $modsToInstall) {
     }
 }
 
+# Remove the retired Lua connect prototype if it is still enabled.
+if ($enabled -contains 'CyrodiilMP_ConnectButtonPrototype') {
+    $newEnabled = $enabled | Where-Object { $_ -ne 'CyrodiilMP_ConnectButtonPrototype' }
+    Set-Content -LiteralPath $enabledPath -Value $newEnabled
+    Write-Host "Disabled retired mod: CyrodiilMP_ConnectButtonPrototype"
+}
+
 Write-Host ''
 Write-Host 'Installed CyrodiilMP UE4SS mods.'
-Write-Host 'Start the game and wait at the main menu.'
-Write-Host 'Runtime dumps should appear in:'
-Write-Host (Join-Path $resolvedGamePath 'OblivionRemastered\Binaries\Win64\CyrodiilMP_RuntimeDumps')
-Write-Host 'Menu probe dumps should appear in:'
-Write-Host (Join-Path $resolvedGamePath 'OblivionRemastered\Binaries\Win64\CyrodiilMP_MenuProbe')
-Write-Host 'Client bridge is installed in:'
-Write-Host $targetBridgePath
 Write-Host ''
-Write-Host 'Console commands are optional; the helpers also run automatically after launch.'
-Write-Host 'Optional console commands:'
-Write-Host '  cyro_dump_runtime'
-Write-Host '  cyro_dump_ui'
-Write-Host '  cyro_menu_probe'
-Write-Host '  cyro_connect'
+Write-Host 'Native plugin:    CyrodiilMP.GameHost (DLL — handles button + hooks natively)'
+Write-Host 'Research tools:   CyrodiilMP_RuntimeInspector (Lua)'
+Write-Host 'Client bridge:   ' $targetBridgePath
+Write-Host 'Runtime dumps:   ' (Join-Path $resolvedGamePath 'OblivionRemastered\Binaries\Win64\CyrodiilMP_RuntimeDumps')
+Write-Host ''
+Write-Host 'Build the native plugin before installing:'
+Write-Host '  cd native'
+Write-Host '  cmake --preset release'
+Write-Host '  cmake --build build/release --config Release'

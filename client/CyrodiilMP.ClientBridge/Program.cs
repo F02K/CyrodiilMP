@@ -19,7 +19,7 @@ return result.Success ? 0 : 1;
 static async Task<BridgeResult> RunAsync(BridgeOptions options)
 {
     var listener = new EventBasedNetListener();
-    using var client = new NetManager(listener)
+    var client = new NetManager(listener)
     {
         AutoRecycle = true,
         IPv6Enabled = false
@@ -27,6 +27,7 @@ static async Task<BridgeResult> RunAsync(BridgeOptions options)
     var deadline = DateTimeOffset.UtcNow + options.Timeout;
     var sentAt = (DateTimeOffset?)null;
     var failure = (BridgeResult?)null;
+    var welcomePlayerId = (int?)null;
 
     listener.PeerConnectedEvent += peer =>
     {
@@ -52,6 +53,24 @@ static async Task<BridgeResult> RunAsync(BridgeOptions options)
         failure ??= BridgeResult.Failed(options, "network-error", error.ToString());
     };
 
+    listener.NetworkReceiveEvent += (_, reader, _, _) =>
+    {
+        var payload = reader.GetRemainingBytes();
+        var text = CyrodiilProtocol.DecodePreview(payload);
+        if (text.StartsWith("server-welcome ", StringComparison.Ordinal))
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(text, @"player_id=(\d+)");
+            if (match.Success && int.TryParse(match.Groups[1].Value, out var pid))
+            {
+                welcomePlayerId = pid;
+            }
+            else
+            {
+                welcomePlayerId = 0;
+            }
+        }
+    };
+
     if (!client.Start())
     {
         return BridgeResult.Failed(options, "client-start-failed", "NetManager.Start returned false.");
@@ -69,7 +88,7 @@ static async Task<BridgeResult> RunAsync(BridgeOptions options)
             return failure;
         }
 
-        if (sentAt is not null && DateTimeOffset.UtcNow - sentAt.Value > TimeSpan.FromMilliseconds(350))
+        if (welcomePlayerId is not null)
         {
             client.Stop();
             return new BridgeResult(
@@ -79,7 +98,8 @@ static async Task<BridgeResult> RunAsync(BridgeOptions options)
                 options.Port,
                 options.Name,
                 options.Reason,
-                "connected-and-sent",
+                welcomePlayerId.Value,
+                "server-welcome-received",
                 "");
         }
 
@@ -87,7 +107,8 @@ static async Task<BridgeResult> RunAsync(BridgeOptions options)
     }
 
     client.Stop();
-    return BridgeResult.Failed(options, "timeout", $"No connection within {options.Timeout.TotalMilliseconds:0} ms.");
+    var timeoutReason = sentAt is null ? "no-connection" : "no-server-welcome";
+    return BridgeResult.Failed(options, "timeout", $"{timeoutReason} within {options.Timeout.TotalMilliseconds:0} ms.");
 }
 
 sealed record BridgeOptions(
@@ -130,6 +151,7 @@ sealed record BridgeResult(
     int Port,
     string Name,
     string Reason,
+    int? PlayerId,
     string Status,
     string Error)
 {
@@ -142,6 +164,7 @@ sealed record BridgeResult(
             options.Port,
             options.Name,
             options.Reason,
+            null,
             status,
             error);
     }

@@ -18,6 +18,11 @@ public static class CyrodiilProtocol
         return Utf8($"menu-connect name={Escape(name)} reason={Escape(reason)}");
     }
 
+    public static byte[] CreateServerWelcome(int playerId, string serverName)
+    {
+        return Utf8($"server-welcome player_id={playerId} server_name={Escape(serverName)} protocol=0");
+    }
+
     public static byte[] CreateTransform(
         string name,
         int tick,

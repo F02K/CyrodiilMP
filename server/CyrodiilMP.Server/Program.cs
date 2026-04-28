@@ -3,6 +3,7 @@ using CyrodiilMP.Protocol;
 using LiteNetLib;
 
 var port = GetPort(args);
+var playerIdCounter = 0;
 
 var listener = new EventBasedNetListener();
 var server = new NetManager(listener)
@@ -44,6 +45,14 @@ listener.NetworkReceiveEvent += (peer, reader, channel, method) =>
     var text = CyrodiilProtocol.DecodePreview(payload);
     Console.WriteLine(
         $"{Now()} packet peer={peer.Id} bytes={payload.Length} channel={channel} method={method} preview={preview} text=\"{text}\"");
+
+    if (text.StartsWith("menu-connect ", StringComparison.Ordinal))
+    {
+        var playerId = Interlocked.Increment(ref playerIdCounter);
+        var welcome = CyrodiilProtocol.CreateServerWelcome(playerId, "CyrodiilMP");
+        peer.Send(welcome, DeliveryMethod.ReliableOrdered);
+        Console.WriteLine($"{Now()} sent server-welcome peer={peer.Id} player_id={playerId}");
+    }
 };
 
 Console.CancelKeyPress += (_, eventArgs) =>
