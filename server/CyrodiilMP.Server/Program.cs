@@ -1,9 +1,10 @@
-using System.Collections.Generic;
 using System.Net;
 using CyrodiilMP.Protocol;
+using CyrodiilMP.Server;
 using LiteNetLib;
 
 var port = GetPort(args);
+var nativePort = GetNativePort(args, port + 1);
 var playerIdCounter = 0;
 
 var listener = new EventBasedNetListener();
@@ -12,7 +13,8 @@ var server = new NetManager(listener)
     AutoRecycle = true,
     IPv6Enabled = false
 };
-var welcomedPeers = new HashSet<int>();
+var nativeSidecar = new NativeUdpSidecar(nativePort);
+var playerIds = new Dictionary<int, int>();
 
 listener.ConnectionRequestEvent += request =>
 {
@@ -32,7 +34,7 @@ listener.PeerConnectedEvent += peer =>
 
 listener.PeerDisconnectedEvent += (peer, info) =>
 {
-    welcomedPeers.Remove(peer.Id);
+    playerIds.Remove(peer.Id);
     Console.WriteLine($"{Now()} disconnected peer={peer.Id} reason={info.Reason}");
 };
 
@@ -52,41 +54,43 @@ listener.NetworkReceiveEvent += (peer, reader, channel, method) =>
     {
         if (message.Verb.Equals("hello", StringComparison.OrdinalIgnoreCase))
         {
-            if (welcomedPeers.Add(peer.Id))
+            if (!playerIds.TryGetValue(peer.Id, out var playerId))
             {
+                playerId = Interlocked.Increment(ref playerIdCounter);
+                playerIds[peer.Id] = playerId;
+
                 peer.Send(
-                    CyrodiilProtocol.CreateServerWelcome(peer.Id, CyrodiilProtocol.DefaultServerTickRate),
+                    CyrodiilProtocol.CreateServerWelcome(playerId, CyrodiilProtocol.DefaultServerTickRate),
                     DeliveryMethod.ReliableOrdered);
                 Console.WriteLine(
-                    $"{Now()} welcome-sent peer={peer.Id} name={message.Get("name", "unknown")} source={message.Get("source", "unknown")}");
+                    $"{Now()} welcome-sent peer={peer.Id} player={playerId} name={message.Get("name", "unknown")} source={message.Get("source", "unknown")}");
             }
         }
         else if (message.Verb.Equals("menu-connect", StringComparison.OrdinalIgnoreCase))
         {
+            if (!playerIds.TryGetValue(peer.Id, out var playerId))
+            {
+                playerId = Interlocked.Increment(ref playerIdCounter);
+                playerIds[peer.Id] = playerId;
+            }
+
             peer.Send(
-                CyrodiilProtocol.CreateMenuConnectAck(peer.Id, "received"),
+                CyrodiilProtocol.CreateMenuConnectAck(playerId, "received"),
                 DeliveryMethod.ReliableOrdered);
             Console.WriteLine(
-                $"{Now()} menu-connect peer={peer.Id} name={message.Get("name", "unknown")} reason={message.Get("reason", "unknown")}");
+                $"{Now()} menu-connect peer={peer.Id} player={playerId} name={message.Get("name", "unknown")} reason={message.Get("reason", "unknown")}");
         }
     }
 
     Console.WriteLine(
         $"{Now()} packet peer={peer.Id} bytes={payload.Length} channel={channel} method={method} preview={preview} text=\"{text}\"");
-
-    if (text.StartsWith("menu-connect ", StringComparison.Ordinal))
-    {
-        var playerId = Interlocked.Increment(ref playerIdCounter);
-        var welcome = CyrodiilProtocol.CreateServerWelcome(playerId, "CyrodiilMP");
-        peer.Send(welcome, DeliveryMethod.ReliableOrdered);
-        Console.WriteLine($"{Now()} sent server-welcome peer={peer.Id} player_id={playerId}");
-    }
 };
 
 Console.CancelKeyPress += (_, eventArgs) =>
 {
     eventArgs.Cancel = true;
     server.Stop();
+    _ = nativeSidecar.StopAsync();
 };
 
 if (!server.Start(port))
@@ -96,7 +100,9 @@ if (!server.Start(port))
 }
 
 Console.WriteLine($"{Now()} CyrodiilMP server listening on UDP port {port}");
+nativeSidecar.Start();
 Console.WriteLine($"{Now()} connection key: {CyrodiilProtocol.ConnectionKey}");
+Console.WriteLine($"{Now()} native UDP sidecar port: {nativePort}");
 Console.WriteLine("Press Ctrl+C to stop.");
 
 while (server.IsRunning)
@@ -106,21 +112,33 @@ while (server.IsRunning)
 }
 
 Console.WriteLine($"{Now()} CyrodiilMP server stopped.");
+await nativeSidecar.StopAsync();
 return 0;
 
 static int GetPort(string[] args)
 {
-    if (args.Length == 0)
+    for (var i = 0; i < args.Length - 1; i++)
     {
-        return CyrodiilProtocol.DefaultPort;
+        if (args[i] is "--port" or "-p" && int.TryParse(args[i + 1], out var port))
+        {
+            return port;
+        }
     }
 
-    if (args.Length == 2 && args[0] is "--port" or "-p" && int.TryParse(args[1], out var port))
+    return CyrodiilProtocol.DefaultPort;
+}
+
+static int GetNativePort(string[] args, int fallback)
+{
+    for (var i = 0; i < args.Length - 1; i++)
     {
-        return port;
+        if (args[i] is "--native-port" or "-n" && int.TryParse(args[i + 1], out var port))
+        {
+            return port;
+        }
     }
 
-    throw new ArgumentException("Usage: CyrodiilMP.Server [--port 27015]");
+    return fallback;
 }
 
 static string Now() => DateTimeOffset.Now.ToString("HH:mm:ss.fff");

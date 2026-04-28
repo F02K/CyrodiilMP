@@ -3,145 +3,88 @@
 #include <DynamicOutput/DynamicOutput.hpp>
 #include <Unreal/UObjectGlobals.hpp>
 #include <Unreal/UObject.hpp>
-#include <Unreal/UClass.hpp>
 #include <Unreal/UFunction.hpp>
+#include <Unreal/FName.hpp>
 #include <Unreal/FString.hpp>
 #include <Unreal/FText.hpp>
 
+#include <vector>
+
 namespace CyrodiilMP::ButtonInjector {
 
-// ── Confirmed from RuntimeInspector runtime dump ──────────────────────────────
+static constexpr auto TEXT_BLOCK_CLASS = STR("TextBlock");
+static constexpr auto CREDITS_SLOT = STR("main_credits_wrapper");
+static constexpr auto SET_TEXT_FN = STR("SetText");
+static constexpr auto MULTIPLAYER_LABEL = STR("MULTIPLAYER");
 
-// The panel that holds all main-menu buttons.
-static constexpr auto LAYOUT_CLASS_SHORT =
-    STR("WBP_Modern_MainMenu_ButtonLayout_C");
+static bool s_relabelled = false;
 
-// Full Blueprint asset path for a single button wrapper widget.
-static constexpr auto BUTTON_WRAPPER_PATH =
-    STR("/Game/UI/Modern/Prefabs/Buttons/WBP_MainMenu_Button_Wrapper.WBP_MainMenu_Button_Wrapper_C");
-
-// Blueprint static library for CreateWidget.
-static constexpr auto WIDGET_LIBRARY_PATH =
-    STR("/Script/UMG.WidgetBlueprintLibrary");
-
-// Name we give the new widget so HookManager can identify its clicks.
-static constexpr auto INJECTED_WIDGET_NAME =
-    STR("cyrodiilmp_multiplayer");
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-// Call UWidgetBlueprintLibrary::Create(WorldContextObject, WidgetType) via
-// ProcessEvent on the CDO.  Returns the new UUserWidget* or nullptr.
-static RC::Unreal::UObject* CallCreateWidget(RC::Unreal::UObject* worldContext,
-                                              RC::Unreal::UClass*  widgetClass)
+static bool IsCreditsTextBlock(RC::Unreal::UObject* object)
 {
-    auto* libClass = RC::Unreal::UObjectGlobals::StaticFindObject<RC::Unreal::UClass*>(
-        nullptr, nullptr, WIDGET_LIBRARY_PATH);
-    if (!libClass) return nullptr;
-
-    auto* cdo = libClass->GetDefaultObject();
-    if (!cdo) return nullptr;
-
-    auto* createFn = libClass->FindFunction(STR("Create"));
-    if (!createFn) return nullptr;
-
-    // Params layout must match the Blueprint function signature exactly.
-    struct CreateParams {
-        RC::Unreal::UObject* WorldContextObject{nullptr};
-        RC::Unreal::UClass*  WidgetType{nullptr};
-        RC::Unreal::UObject* ReturnValue{nullptr};
-    } params;
-    params.WorldContextObject = worldContext;
-    params.WidgetType         = widgetClass;
-
-    cdo->ProcessEvent(createFn, &params);
-    return params.ReturnValue;
-}
-
-// Call UPanelWidget::AddChild(Content) via ProcessEvent.
-static void CallAddChild(RC::Unreal::UObject* panel,
-                          RC::Unreal::UObject* child)
-{
-    auto* addChildFn = panel->GetFunctionByName(STR("AddChild"));
-    if (!addChildFn) return;
-
-    struct AddChildParams {
-        RC::Unreal::UObject* Content{nullptr};
-        RC::Unreal::UObject* ReturnValue{nullptr};
-    } params;
-    params.Content = child;
-    panel->ProcessEvent(addChildFn, &params);
-}
-
-// Set a FText property by name via reflection.
-// Tries both "ButtonText" and "LabelText" since the exact property name in
-// the Blueprint is not yet confirmed — update once the Blueprint is inspected.
-static void TrySetButtonText(RC::Unreal::UObject* widget, std::wstring_view text)
-{
-    static constexpr std::wstring_view candidates[] = {
-        STR("ButtonText"),
-        STR("LabelText"),
-        STR("Text"),
-    };
-
-    for (auto propName : candidates)
+    if (!object)
     {
-        auto* ptr = widget->GetValuePtrByPropertyNameInChain<RC::Unreal::FText>(
-            propName.data());
-        if (ptr)
-        {
-            // FText construction via the Unreal string table.
-            // FText::FromString is the simplest factory available at runtime.
-            *ptr = RC::Unreal::FText::FromString(RC::Unreal::FString(text.data()));
-            return;
-        }
+        return false;
     }
 
-    RC::Output::send<RC::LogLevel::Warning>(
-        STR("[CyrodiilMP.GameHost] ButtonInjector: no text property found on new button widget\n"));
+    const auto full_name = object->GetFullName();
+    return full_name.find(CREDITS_SLOT) != std::wstring::npos;
 }
 
-// ── Public API ────────────────────────────────────────────────────────────────
+static bool CallSetText(RC::Unreal::UObject* text_block)
+{
+    auto* set_text = text_block->GetFunctionByName(SET_TEXT_FN);
+    if (!set_text)
+    {
+        return false;
+    }
 
-static bool s_injected = false;
+    struct SetTextParams
+    {
+        RC::Unreal::FText InText;
+    } params{RC::Unreal::FText::FromString(RC::Unreal::FString(MULTIPLAYER_LABEL))};
+
+    text_block->ProcessEvent(set_text, &params);
+    return true;
+}
 
 bool TryInject()
 {
-    if (s_injected) return true;
-
-    // The layout panel must be alive (i.e. the main menu is showing).
-    auto* layout = RC::Unreal::UObjectGlobals::FindFirstOf(LAYOUT_CLASS_SHORT);
-    if (!layout) return false;
-
-    // Resolve the button wrapper Blueprint class.
-    auto* btnClass = RC::Unreal::UObjectGlobals::StaticFindObject<RC::Unreal::UClass*>(
-        nullptr, nullptr, BUTTON_WRAPPER_PATH);
-    if (!btnClass)
+    if (s_relabelled)
     {
-        RC::Output::send<RC::LogLevel::Warning>(
-            STR("[CyrodiilMP.GameHost] ButtonInjector: WBP_MainMenu_Button_Wrapper_C not found\n"));
+        return true;
+    }
+
+    std::vector<RC::Unreal::UObject*> text_blocks;
+    text_blocks.reserve(64);
+    RC::Unreal::UObjectGlobals::FindAllOf(RC::Unreal::FName(TEXT_BLOCK_CLASS, FNAME_Add), text_blocks);
+
+    if (text_blocks.empty())
+    {
         return false;
     }
 
-    // Create the new widget instance.
-    auto* newBtn = CallCreateWidget(layout, btnClass);
-    if (!newBtn)
+    int relabelled_count = 0;
+    for (auto* text_block : text_blocks)
     {
-        RC::Output::send<RC::LogLevel::Warning>(
-            STR("[CyrodiilMP.GameHost] ButtonInjector: CreateWidget returned nullptr\n"));
+        if (!IsCreditsTextBlock(text_block))
+        {
+            continue;
+        }
+
+        if (CallSetText(text_block))
+        {
+            ++relabelled_count;
+        }
+    }
+
+    if (relabelled_count <= 0)
+    {
         return false;
     }
 
-    // Rename the widget so our hook can identify clicks on it.
-    newBtn->SetFName(RC::Unreal::FName(INJECTED_WIDGET_NAME));
-
-    // Set the button label to "MULTIPLAYER".
-    TrySetButtonText(newBtn, STR("MULTIPLAYER"));
-
-    // Add to the layout panel.
-    CallAddChild(layout, newBtn);
-
-    s_injected = true;
+    s_relabelled = true;
+    RC::Output::send<RC::LogLevel::Normal>(
+        STR("[CyrodiilMP.GameHost] Credits button relabelled to MULTIPLAYER by native DLL\n"));
     return true;
 }
 
