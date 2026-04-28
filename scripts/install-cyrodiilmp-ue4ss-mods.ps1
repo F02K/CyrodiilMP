@@ -11,20 +11,33 @@ Import-Module $modulePath -Force
 
 $projectRoot = Resolve-Path (Join-Path $PSScriptRoot '..')
 $resolvedGamePath = Resolve-CyrodiilMPGamePath -GamePath $GamePath
+$targetGameRoot = Join-Path $resolvedGamePath 'OblivionRemastered'
+$targetContentPath = Join-Path $targetGameRoot 'Content'
+$targetPaksPath = Join-Path $targetContentPath 'Paks'
 $sourceModsPath = Join-Path $projectRoot 'game-plugin\UE4SS\Mods'
-$targetModsPath = Join-Path $resolvedGamePath 'OblivionRemastered\Binaries\Win64\Mods'
 $targetWin64Path = Join-Path $resolvedGamePath 'OblivionRemastered\Binaries\Win64'
+$targetModsPath = Join-Path $targetWin64Path 'Mods'
 $targetBridgePath = Join-Path $targetWin64Path 'CyrodiilMP\ClientBridge'
-$enabledPath = Join-Path $targetModsPath 'enabled.txt'
+$runtimeDumpPath = Join-Path $targetWin64Path 'CyrodiilMP_RuntimeDumps'
+$menuProbePath = Join-Path $targetWin64Path 'CyrodiilMP_MenuProbe'
+$modsListPath = Join-Path $targetModsPath 'mods.txt'
 
-if (-not (Test-Path -LiteralPath $targetModsPath -PathType Container)) {
-    throw "UE4SS Mods folder was not found: $targetModsPath"
+if (-not (Test-Path -LiteralPath $targetGameRoot -PathType Container)) {
+    throw "Game path does not look like an Oblivion Remastered install root. Missing folder: $targetGameRoot"
 }
+
+if (-not ((Test-Path -LiteralPath $targetWin64Path -PathType Container) -or (Test-Path -LiteralPath $targetPaksPath -PathType Container))) {
+    throw "Game path does not look complete enough for UE4SS install. Expected either $targetWin64Path or $targetPaksPath to exist."
+}
+
+New-Item -ItemType Directory -Path $targetWin64Path -Force | Out-Null
+New-Item -ItemType Directory -Path $targetModsPath -Force | Out-Null
+New-Item -ItemType Directory -Path $targetBridgePath -Force | Out-Null
+New-Item -ItemType Directory -Path $runtimeDumpPath -Force | Out-Null
+New-Item -ItemType Directory -Path $menuProbePath -Force | Out-Null
 
 $modsToInstall = @(
     'CyrodiilMP_RuntimeInspector'
-    # CyrodiilMP_ConnectButtonPrototype is retired — replaced by the native plugin.
-    # Re-add it here only if you need the Lua prototype for debugging.
 )
 
 if ($IncludeAutoUSMAP) {
@@ -34,6 +47,7 @@ if ($IncludeAutoUSMAP) {
 foreach ($modName in $modsToInstall) {
     $source = Join-Path $sourceModsPath $modName
     $target = Join-Path $targetModsPath $modName
+    $modEnabledPath = Join-Path $target 'enabled.txt'
 
     if (-not (Test-Path -LiteralPath $source -PathType Container)) {
         throw "Missing source mod: $source"
@@ -41,6 +55,9 @@ foreach ($modName in $modsToInstall) {
 
     New-Item -ItemType Directory -Path $target -Force | Out-Null
     Copy-Item -Path (Join-Path $source '*') -Destination $target -Recurse -Force
+    if (-not (Test-Path -LiteralPath $modEnabledPath -PathType Leaf)) {
+        New-Item -ItemType File -Path $modEnabledPath -Force | Out-Null
+    }
     Write-Host "Installed $modName -> $target"
 }
 
@@ -58,54 +75,74 @@ if (-not $SkipClientBridgePublish) {
     Write-Host "Installed CyrodiilMP.ClientBridge -> $targetBridgePath"
 }
 
-# ── Native plugin (CyrodiilMP.GameHost DLL mod) ───────────────────────────────
 if (-not $SkipNativePlugin) {
-    $nativeModName   = 'CyrodiilMP.GameHost'
-    $nativeSourceDir = Join-Path $projectRoot "game-plugin\UE4SS\Mods\$nativeModName"
+    $nativeModName = 'CyrodiilMP.GameHost'
+    $nativeSourceDir = Join-Path $sourceModsPath $nativeModName
     $nativeTargetDir = Join-Path $targetModsPath $nativeModName
-    $nativeDll       = Join-Path $nativeSourceDir 'dlls\main.dll'
+    $nativeDll = Join-Path $nativeSourceDir 'dlls\main.dll'
+    $nativeEnabledPath = Join-Path $nativeTargetDir 'enabled.txt'
 
     if (-not (Test-Path -LiteralPath $nativeDll -PathType Leaf)) {
         Write-Warning "Native plugin DLL not found at $nativeDll"
-        Write-Warning "Build it first: cd native && cmake --preset release && cmake --build build/release --config Release"
-        Write-Warning "Skipping native plugin installation."
-    } else {
-        New-Item -ItemType Directory -Path (Join-Path $nativeTargetDir 'dlls') -Force | Out-Null
-        Copy-Item -Path $nativeDll -Destination (Join-Path $nativeTargetDir 'dlls\main.dll') -Force
+        Write-Warning 'Build it first with:'
+        Write-Warning '  .\scripts\build-native.ps1 -Configuration Release'
+        Write-Warning 'Skipping native plugin installation for now.'
+    }
+    else {
+        New-Item -ItemType Directory -Path $nativeTargetDir -Force | Out-Null
+        Copy-Item -Path (Join-Path $nativeSourceDir '*') -Destination $nativeTargetDir -Recurse -Force
+        if (-not (Test-Path -LiteralPath $nativeEnabledPath -PathType Leaf)) {
+            New-Item -ItemType File -Path $nativeEnabledPath -Force | Out-Null
+        }
         Write-Host "Installed $nativeModName -> $nativeTargetDir"
         $modsToInstall += $nativeModName
     }
 }
 
-# ── Update enabled.txt ────────────────────────────────────────────────────────
-if (-not (Test-Path -LiteralPath $enabledPath -PathType Leaf)) {
-    New-Item -ItemType File -Path $enabledPath -Force | Out-Null
-}
+if (Test-Path -LiteralPath $modsListPath -PathType Leaf) {
+    $modsList = Get-Content -LiteralPath $modsListPath
+    foreach ($modName in $modsToInstall) {
+        $pattern = '^\s*' + [Regex]::Escape($modName) + '\s*:'
+        if (-not ($modsList | Where-Object { $_ -match $pattern })) {
+            Add-Content -LiteralPath $modsListPath -Value "$modName : 1"
+            Write-Host "Added $modName to mods.txt"
+        }
+    }
 
-$enabled = @(Get-Content -LiteralPath $enabledPath -ErrorAction SilentlyContinue)
-foreach ($modName in $modsToInstall) {
-    if ($enabled -notcontains $modName) {
-        Add-Content -LiteralPath $enabledPath -Value $modName
-        Write-Host "Enabled $modName"
+    $prototypePattern = '^\s*CyrodiilMP_ConnectButtonPrototype\s*:'
+    $filteredModsList = $modsList | Where-Object { $_ -notmatch $prototypePattern }
+    if ($filteredModsList.Count -ne $modsList.Count) {
+        Set-Content -LiteralPath $modsListPath -Value $filteredModsList
+        Write-Host 'Disabled retired mod in mods.txt: CyrodiilMP_ConnectButtonPrototype'
     }
 }
 
-# Remove the retired Lua connect prototype if it is still enabled.
-if ($enabled -contains 'CyrodiilMP_ConnectButtonPrototype') {
-    $newEnabled = $enabled | Where-Object { $_ -ne 'CyrodiilMP_ConnectButtonPrototype' }
-    Set-Content -LiteralPath $enabledPath -Value $newEnabled
-    Write-Host "Disabled retired mod: CyrodiilMP_ConnectButtonPrototype"
+$prototypeEnabledPath = Join-Path $targetModsPath 'CyrodiilMP_ConnectButtonPrototype\enabled.txt'
+if (Test-Path -LiteralPath $prototypeEnabledPath -PathType Leaf) {
+    Remove-Item -LiteralPath $prototypeEnabledPath -Force
+    Write-Host 'Disabled retired mod marker: CyrodiilMP_ConnectButtonPrototype\enabled.txt'
 }
 
 Write-Host ''
 Write-Host 'Installed CyrodiilMP UE4SS mods.'
+Write-Host 'Start the game and wait at the main menu.'
+Write-Host 'Runtime dumps should appear in:'
+Write-Host $runtimeDumpPath
+Write-Host 'Menu probe dumps should appear in:'
+Write-Host $menuProbePath
+if ($SkipClientBridgePublish) {
+    Write-Host 'Client bridge publish/install was skipped.'
+    Write-Host 'Expected client bridge folder:'
+    Write-Host $targetBridgePath
+}
+else {
+    Write-Host 'Client bridge is installed in:'
+    Write-Host $targetBridgePath
+}
 Write-Host ''
-Write-Host 'Native plugin:    CyrodiilMP.GameHost (DLL — handles button + hooks natively)'
+Write-Host 'Native plugin:    CyrodiilMP.GameHost (DLL, intended long-term connect path)'
 Write-Host 'Research tools:   CyrodiilMP_RuntimeInspector (Lua)'
-Write-Host 'Client bridge:   ' $targetBridgePath
-Write-Host 'Runtime dumps:   ' (Join-Path $resolvedGamePath 'OblivionRemastered\Binaries\Win64\CyrodiilMP_RuntimeDumps')
+Write-Host 'Connect prototype: CyrodiilMP_ConnectButtonPrototype is no longer installed by default'
 Write-Host ''
-Write-Host 'Build the native plugin before installing:'
-Write-Host '  cd native'
-Write-Host '  cmake --preset release'
-Write-Host '  cmake --build build/release --config Release'
+Write-Host 'Build the native plugin before installing if you want the non-Lua path:'
+Write-Host '  .\scripts\build-native.ps1 -Configuration Release'

@@ -10,6 +10,32 @@ $outLog = Join-Path $logDir 'dashboard.out.log'
 $errLog = Join-Path $logDir 'dashboard.err.log'
 $runner = Join-Path $logDir 'dashboard-runner.cmd'
 
+function Get-DotNetCommand {
+    return Get-Command dotnet -ErrorAction SilentlyContinue
+}
+
+function Assert-DotNetRuntimeAvailable {
+    $dotnet = Get-DotNetCommand
+    if (-not $dotnet) {
+        throw @"
+The dashboard background runner requires 'dotnet', but it was not found on PATH.
+
+Install a .NET SDK or runtime, then retry:
+https://aka.ms/dotnet/download
+"@
+    }
+
+    $runtimes = & $dotnet.Source --list-runtimes 2>$null
+    if (-not $runtimes) {
+        throw @"
+The dashboard background runner requires a .NET runtime, but none were found on this machine.
+
+Install a .NET SDK or runtime, then retry:
+https://aka.ms/dotnet/download
+"@
+    }
+}
+
 New-Item -ItemType Directory -Path $logDir -Force | Out-Null
 $env:CYRODIILMP_ROOT = $root
 $env:CYRODIILMP_DASHBOARD_URL = "http://127.0.0.1:$Port"
@@ -29,6 +55,8 @@ function Test-DashboardReady {
         return $false
     }
 }
+
+Assert-DotNetRuntimeAvailable
 
 if (-not (Test-Path -LiteralPath $dashboardDll -PathType Leaf)) {
     throw "Dashboard is not built yet. Run scripts\run-dashboard.cmd once or build the dashboard project."

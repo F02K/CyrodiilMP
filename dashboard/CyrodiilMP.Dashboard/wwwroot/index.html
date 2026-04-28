@@ -3,80 +3,300 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CyrodiilMP Inspector</title>
+  <title>CyrodiilMP Dashboard</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <h1>CyrodiilMP Inspector</h1>
-      <p id="project-root"></p>
-    </div>
-    <button id="refresh-button" class="icon-button" title="Refresh data" type="button">R</button>
-  </header>
-
-  <main class="layout">
-    <aside class="sidebar">
-      <section class="panel">
-        <h2>Research</h2>
-        <label for="game-path">Game Path</label>
-        <input id="game-path" type="text" autocomplete="off">
-        <div class="actions">
-          <button id="run-full-button" type="button">Run Full Research</button>
-        </div>
-        <div id="job-status" class="status idle">Idle</div>
-      </section>
-
-      <section class="panel">
-        <h2>Runs</h2>
-        <div id="runs" class="run-list"></div>
-      </section>
-
-      <section class="panel">
-        <h2>Runtime Dumps</h2>
-        <div class="actions">
-          <button id="analyze-runtime-button" type="button" disabled>Analyze Selected Dump</button>
-        </div>
-        <div id="runtime-dumps" class="run-list"></div>
-      </section>
-    </aside>
-
-    <section class="content">
-      <div class="metrics">
-        <div class="metric">
-          <span>Total Files</span>
-          <strong id="metric-total">-</strong>
-        </div>
-        <div class="metric">
-          <span>UE Packages</span>
-          <strong id="metric-packages">-</strong>
-        </div>
-        <div class="metric">
-          <span>Legacy Data</span>
-          <strong id="metric-legacy">-</strong>
-        </div>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero__copy">
+        <p class="eyebrow">Operator Console</p>
+        <h1>CyrodiilMP Dashboard</h1>
+        <p class="hero__subtitle">
+          Browser-based helper for the research scripts, runtime dumps, server smoke tests, and artifact trails already living in this repo.
+        </p>
+        <p id="project-root" class="hero__path"></p>
       </div>
+      <div class="hero__actions">
+        <button id="refresh-button" class="primary-button" type="button">Refresh State</button>
+      </div>
+    </header>
 
-      <nav id="tabs" class="tabs" aria-label="Files">
-        <button class="tab active" data-file="report.md" type="button">Report</button>
-        <button class="tab" data-file="packages.csv" type="button">Packages</button>
-        <button class="tab" data-file="legacy-data.csv" type="button">Legacy Data</button>
-        <button class="tab" data-file="executables-and-dlls.csv" type="button">Binaries</button>
-        <button class="tab" data-file="ini-summary.csv" type="button">INI</button>
-        <button class="tab" data-file="largest-files.csv" type="button">Largest</button>
-        <button class="tab" data-file="layout.csv" type="button">Layout</button>
-      </nav>
+    <div id="flash-message" class="flash-message hidden" role="status" aria-live="polite"></div>
 
-      <section id="viewer" class="viewer">
-        <div class="empty">Select a research run or runtime dump.</div>
-      </section>
-
-      <section class="panel log-panel">
-        <h2>Job Log</h2>
-        <pre id="job-log"></pre>
-      </section>
+    <section class="summary-grid">
+      <article class="stat-card">
+        <span class="stat-card__label">Inventories</span>
+        <strong id="inventory-count" class="stat-card__value">0</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-card__label">Full Research</span>
+        <strong id="full-research-count" class="stat-card__value">0</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-card__label">Note Runs</span>
+        <strong id="note-run-count" class="stat-card__value">0</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-card__label">Runtime Dumps</span>
+        <strong id="runtime-dump-count" class="stat-card__value">0</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-card__label">Current Job</span>
+        <strong id="job-state" class="stat-card__value">Idle</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-card__label">Server</span>
+        <strong id="server-state" class="stat-card__value">Stopped</strong>
+      </article>
     </section>
-  </main>
+
+    <main class="main-grid">
+      <aside class="control-column">
+        <section class="panel">
+          <div class="panel__header">
+            <div>
+              <h2>Workspace</h2>
+              <p>Set the local game path once, then launch the helper scripts without leaving the browser.</p>
+            </div>
+          </div>
+
+          <label class="field">
+            <span class="field__label">Game Path</span>
+            <input id="game-path-input" class="field__input" type="text" autocomplete="off" placeholder="F:\Steam\steamapps\common\Oblivion Remastered">
+          </label>
+
+          <div class="button-row">
+            <button id="save-game-path-button" class="primary-button" type="button">Save Path</button>
+          </div>
+
+          <div class="inline-meta">
+            <span class="inline-meta__label">Path file</span>
+            <code id="game-path-file">game-path.txt</code>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel__header">
+            <div>
+              <h2>UE4SS Install</h2>
+              <p>Detect whether the helper mods and client bridge are already installed into your local game folder.</p>
+            </div>
+          </div>
+
+          <div id="ue4ss-install-summary" class="status-box">Install status will appear here after refresh.</div>
+          <div class="inline-meta">
+            <span class="inline-meta__label">Mods path</span>
+            <code id="ue4ss-install-path">Not detected yet</code>
+          </div>
+
+          <div class="button-row">
+            <button id="install-ue4ss-button" class="primary-button" type="button">Install UE4SS Mods</button>
+          </div>
+
+          <div id="ue4ss-install-details" class="check-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel__header">
+            <div>
+              <h2>Research Actions</h2>
+              <p>Kick off the inventory and full research passes directly from here.</p>
+            </div>
+          </div>
+
+          <div class="button-grid">
+            <button id="quick-scan-button" class="ghost-button" type="button">Run Quick Scan</button>
+            <button id="full-research-button" class="primary-button" type="button">Run Full Research</button>
+          </div>
+
+          <label class="field">
+            <span class="field__label">New Research Run Name</span>
+            <input id="new-run-name" class="field__input" type="text" value="manual">
+          </label>
+
+          <div class="button-row">
+            <button id="create-note-run-button" class="ghost-button" type="button">Create Notes Run</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel__header">
+            <div>
+              <h2>Runtime Helper</h2>
+              <p>Collect and analyze the UE4SS runtime dump artifacts produced by the current game-side experiments.</p>
+            </div>
+          </div>
+
+          <label class="field">
+            <span class="field__label">Collected Dump Name</span>
+            <input id="collect-dump-name" class="field__input" type="text" value="runtime">
+          </label>
+
+          <div class="button-grid">
+            <button id="collect-dump-button" class="ghost-button" type="button">Collect Dumps</button>
+            <button id="analyze-selected-dump-button" class="primary-button" type="button">Analyze Selected Dump</button>
+          </div>
+
+          <p class="panel__hint">Select a runtime dump in the explorer before running analysis.</p>
+        </section>
+
+        <section class="panel">
+          <div class="panel__header">
+            <div>
+              <h2>Network Smoke</h2>
+              <p>Start the helper-managed server and run the short-lived client bridge smoke test.</p>
+            </div>
+          </div>
+
+          <label class="field field--compact">
+            <span class="field__label">Server Port</span>
+            <input id="server-port-input" class="field__input" type="number" min="1" max="65535" value="27015">
+          </label>
+
+          <div class="button-grid">
+            <button id="server-start-button" class="primary-button" type="button">Start Server</button>
+            <button id="server-stop-button" class="ghost-button" type="button">Stop Server</button>
+          </div>
+
+          <div class="button-row">
+            <button id="server-force-stop-button" class="danger-button" type="button">Force Kill Server</button>
+          </div>
+
+          <div id="server-summary" class="status-box">Server helper is not running.</div>
+
+          <div class="divider"></div>
+
+          <label class="field field--compact">
+            <span class="field__label">Bridge Host</span>
+            <input id="bridge-host-input" class="field__input" type="text" value="127.0.0.1">
+          </label>
+          <div class="field-grid">
+            <label class="field field--compact">
+              <span class="field__label">Bridge Port</span>
+              <input id="bridge-port-input" class="field__input" type="number" min="1" max="65535" value="27015">
+            </label>
+            <label class="field field--compact">
+              <span class="field__label">Timeout (ms)</span>
+              <input id="bridge-timeout-input" class="field__input" type="number" min="100" value="1800">
+            </label>
+          </div>
+          <div class="field-grid">
+            <label class="field field--compact">
+              <span class="field__label">Bridge Name</span>
+              <input id="bridge-name-input" class="field__input" type="text" value="DashboardBridge">
+            </label>
+            <label class="field field--compact">
+              <span class="field__label">Reason</span>
+              <input id="bridge-reason-input" class="field__input" type="text" value="dashboard-smoke">
+            </label>
+          </div>
+
+          <div class="button-row">
+            <button id="bridge-run-button" class="ghost-button" type="button">Run Client Bridge</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel__header panel__header--inline">
+            <div>
+              <h2>Activity</h2>
+              <p>Tracked dashboard jobs and their most recent logs.</p>
+            </div>
+            <button id="cancel-job-button" class="ghost-button" type="button">Cancel Job</button>
+          </div>
+
+          <div id="current-job-summary" class="status-box">No job has run yet.</div>
+          <div id="recent-jobs" class="chip-list"></div>
+          <pre id="current-job-log" class="log-view">No logs yet.</pre>
+        </section>
+      </aside>
+
+      <section class="workspace-column">
+        <section class="panel">
+          <div class="panel__header">
+            <div>
+              <h2>Artifact Explorer</h2>
+              <p>Browse the files produced by each helper workflow without hopping back to the terminal.</p>
+            </div>
+          </div>
+
+          <div class="artifact-grid">
+            <section class="artifact-section">
+              <div class="artifact-section__header">
+                <h3>Game Inventories</h3>
+                <span id="inventories-count-badge" class="pill">0</span>
+              </div>
+              <div id="inventories-list" class="artifact-list"></div>
+            </section>
+
+            <section class="artifact-section">
+              <div class="artifact-section__header">
+                <h3>Full Research</h3>
+                <span id="full-runs-count-badge" class="pill">0</span>
+              </div>
+              <div id="runs-list" class="artifact-list"></div>
+            </section>
+
+            <section class="artifact-section">
+              <div class="artifact-section__header">
+                <h3>Research Notes</h3>
+                <span id="note-runs-count-badge" class="pill">0</span>
+              </div>
+              <div id="note-runs-list" class="artifact-list"></div>
+            </section>
+
+            <section class="artifact-section">
+              <div class="artifact-section__header">
+                <h3>Runtime Dumps</h3>
+                <span id="runtime-dumps-count-badge" class="pill">0</span>
+              </div>
+              <div id="runtime-dumps-list" class="artifact-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel__header">
+            <div>
+              <h2 id="viewer-title">Viewer</h2>
+              <p id="viewer-meta">Select an artifact from the explorer to inspect its files.</p>
+            </div>
+          </div>
+
+          <nav id="file-tabs" class="tab-row" aria-label="Artifact files"></nav>
+          <section id="viewer" class="viewer">
+            <div class="empty-state">
+              <strong>Nothing selected yet.</strong>
+              <p>Pick an inventory, research run, note run, or runtime dump to inspect its generated files.</p>
+            </div>
+          </section>
+        </section>
+
+        <section class="log-grid">
+          <section class="panel">
+            <div class="panel__header">
+              <div>
+                <h2>Server Log</h2>
+                <p>Tracked output for the helper-managed server process.</p>
+              </div>
+            </div>
+            <pre id="server-log" class="log-view">Server log will appear here after the helper starts.</pre>
+          </section>
+
+          <section class="panel">
+            <div class="panel__header">
+              <div>
+                <h2>Selection Snapshot</h2>
+                <p id="selection-summary">File details and summaries for the current artifact selection.</p>
+              </div>
+            </div>
+            <div id="selection-facts" class="facts-list"></div>
+          </section>
+        </section>
+      </section>
+    </main>
+  </div>
 
   <script src="/app.js"></script>
 </body>

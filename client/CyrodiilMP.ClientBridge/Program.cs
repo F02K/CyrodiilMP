@@ -24,91 +24,123 @@ static async Task<BridgeResult> RunAsync(BridgeOptions options)
         AutoRecycle = true,
         IPv6Enabled = false
     };
-    var deadline = DateTimeOffset.UtcNow + options.Timeout;
-    var sentAt = (DateTimeOffset?)null;
-    var failure = (BridgeResult?)null;
-    var welcomePlayerId = (int?)null;
-
-    listener.PeerConnectedEvent += peer =>
+    try
     {
-        try
+        var deadline = DateTimeOffset.UtcNow + options.Timeout;
+        var sentAt = (DateTimeOffset?)null;
+        var failure = (BridgeResult?)null;
+        var welcome = (ServerWelcome?)null;
+        var menuAck = (MenuConnectAck?)null;
+
+        listener.PeerConnectedEvent += peer =>
         {
-            peer.Send(CyrodiilProtocol.CreateHello(options.Name, "ue4ss-menu"), DeliveryMethod.ReliableOrdered);
-            peer.Send(CyrodiilProtocol.CreateMenuConnectRequest(options.Name, options.Reason), DeliveryMethod.ReliableOrdered);
-            sentAt = DateTimeOffset.UtcNow;
-        }
-        catch (Exception ex)
-        {
-            failure = BridgeResult.Failed(options, "send-failed", ex.Message);
-        }
-    };
-
-    listener.PeerDisconnectedEvent += (_, info) =>
-    {
-        failure ??= BridgeResult.Failed(options, "disconnected", info.Reason.ToString());
-    };
-
-    listener.NetworkErrorEvent += (_, error) =>
-    {
-        failure ??= BridgeResult.Failed(options, "network-error", error.ToString());
-    };
-
-    listener.NetworkReceiveEvent += (_, reader, _, _) =>
-    {
-        var payload = reader.GetRemainingBytes();
-        var text = CyrodiilProtocol.DecodePreview(payload);
-        if (text.StartsWith("server-welcome ", StringComparison.Ordinal))
-        {
-            var match = System.Text.RegularExpressions.Regex.Match(text, @"player_id=(\d+)");
-            if (match.Success && int.TryParse(match.Groups[1].Value, out var pid))
+            try
             {
-                welcomePlayerId = pid;
+                peer.Send(CyrodiilProtocol.CreateHello(options.Name, "ue4ss-menu"), DeliveryMethod.ReliableOrdered);
+                peer.Send(CyrodiilProtocol.CreateMenuConnectRequest(options.Name, options.Reason), DeliveryMethod.ReliableOrdered);
+                sentAt = DateTimeOffset.UtcNow;
             }
-            else
+            catch (Exception ex)
             {
-                welcomePlayerId = 0;
+                failure = BridgeResult.Failed(options, "send-failed", ex.Message);
             }
-        }
-    };
+        };
 
-    if (!client.Start())
-    {
-        return BridgeResult.Failed(options, "client-start-failed", "NetManager.Start returned false.");
-    }
-
-    client.Connect(options.Host, options.Port, CyrodiilProtocol.ConnectionKey);
-
-    while (DateTimeOffset.UtcNow < deadline)
-    {
-        client.PollEvents();
-
-        if (failure is not null)
+        listener.PeerDisconnectedEvent += (_, info) =>
         {
-            client.Stop();
-            return failure;
-        }
+            failure ??= BridgeResult.Failed(options, "disconnected", info.Reason.ToString());
+        };
 
-        if (welcomePlayerId is not null)
+        listener.NetworkErrorEvent += (_, error) =>
         {
-            client.Stop();
-            return new BridgeResult(
-                true,
-                DateTimeOffset.Now,
-                options.Host,
-                options.Port,
-                options.Name,
-                options.Reason,
-                welcomePlayerId.Value,
-                "server-welcome-received",
-                "");
+            failure ??= BridgeResult.Failed(options, "network-error", error.ToString());
+        };
+
+        listener.NetworkReceiveEvent += (_, reader, _, _) =>
+        {
+            var payload = reader.GetRemainingBytes();
+            var message = CyrodiilProtocol.ParseMessage(payload);
+            if (message is null)
+            {
+                return;
+            }
+
+            if (message.Verb.Equals("server-welcome", StringComparison.OrdinalIgnoreCase))
+            {
+                welcome = new ServerWelcome(
+                    message.GetInt("player"),
+                    message.GetInt("tick_rate"),
+                    message.GetInt("protocol", -1));
+                return;
+            }
+
+            if (message.Verb.Equals("menu-connect-ack", StringComparison.OrdinalIgnoreCase))
+            {
+                menuAck = new MenuConnectAck(
+                    message.GetInt("player"),
+                    message.Get("status", ""));
+            }
+        };
+
+        if (!client.Start())
+        {
+            return BridgeResult.Failed(options, "client-start-failed", "NetManager.Start returned false.");
         }
 
-        await Task.Delay(15);
-    }
+        client.Connect(options.Host, options.Port, CyrodiilProtocol.ConnectionKey);
 
-    client.Stop();
-    var timeoutReason = sentAt is null ? "no-connection" : "no-server-welcome";
-    return BridgeResult.Failed(options, "timeout", $"{timeoutReason} within {options.Timeout.TotalMilliseconds:0} ms.");
+        while (DateTimeOffset.UtcNow < deadline)
+        {
+            client.PollEvents();
+
+            if (failure is not null)
+            {
+                return failure;
+            }
+
+            if (welcome is not null)
+            {
+                return new BridgeResult(
+                    true,
+                    DateTimeOffset.Now,
+                    options.Host,
+                    options.Port,
+                    options.Name,
+                    options.Reason,
+                    "welcome-received",
+                    "",
+                    welcome.PlayerId,
+                    welcome.TickRate,
+                    welcome.Protocol,
+                    menuAck?.Status ?? "");
+            }
+
+            if (sentAt is not null && DateTimeOffset.UtcNow - sentAt.Value > TimeSpan.FromMilliseconds(500) && menuAck is not null)
+            {
+                return new BridgeResult(
+                    true,
+                    DateTimeOffset.Now,
+                    options.Host,
+                    options.Port,
+                    options.Name,
+                    options.Reason,
+                    "menu-ack-received",
+                    "",
+                    menuAck.PlayerId,
+                    0,
+                    CyrodiilProtocol.ProtocolVersion,
+                    menuAck.Status);
+            }
+
+            await Task.Delay(15);
+        }
+
+        return BridgeResult.Failed(options, "timeout", $"No connection within {options.Timeout.TotalMilliseconds:0} ms.");
+    }
+    finally
+    {
+        client.Stop();
+    }
 }
 
 sealed record BridgeOptions(
@@ -151,9 +183,12 @@ sealed record BridgeResult(
     int Port,
     string Name,
     string Reason,
-    int? PlayerId,
     string Status,
-    string Error)
+    string Error,
+    int AssignedPlayerId,
+    int ServerTickRate,
+    int ServerProtocol,
+    string MenuConnectAckStatus)
 {
     public static BridgeResult Failed(BridgeOptions options, string status, string error)
     {
@@ -164,8 +199,14 @@ sealed record BridgeResult(
             options.Port,
             options.Name,
             options.Reason,
-            null,
             status,
-            error);
+            error,
+            0,
+            0,
+            -1,
+            "");
     }
 }
+
+sealed record ServerWelcome(int PlayerId, int TickRate, int Protocol);
+sealed record MenuConnectAck(int PlayerId, string Status);
