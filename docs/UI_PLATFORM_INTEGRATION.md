@@ -9,7 +9,7 @@ The NirnLabUIPlatform source is referenced as a submodule under `vendor/NirnLabU
 - UI runtime work should move into the owned launcher/bootstrap native path.
 - UE4SS may still be used for dumps and runtime inspection, but not for game UI ownership.
 - Static web assets live in `game-plugin/UI/cyrodiilmp`.
-- NirnLabUIPlatform points at the `F02K/NirnLabUIPlatform` fork on the `oblivion-remastered-host` branch, with Oblivion Remastered patch notes in `vendor/NirnLabUIPlatform/OBLIVION_REMASTERED.md`.
+- NirnLabUIPlatform points at the `F02K/NirnLabUIPlatform` fork on the `oblivion-remastered-host` branch. That fork is now allowed to become Oblivion Remastered-only; Skyrim/SKSE compatibility is not a target.
 
 ## Runtime Contract
 
@@ -28,12 +28,10 @@ The first JavaScript commands are:
 
 ## Host Detection
 
-The vendored NirnLab API now includes `NirnLabUIPlatformAPI/Host.h`.
-This lets code distinguish between upstream Skyrim/SKSE and a general Oblivion
-Remastered implementation.
+The vendored NirnLab API includes `NirnLabUIPlatformAPI/Host.h`.
+This fork reports Oblivion Remastered as its only supported runtime host.
 
-- Upstream-style builds define `NL_UI_HOST_SKYRIM_SKSE`.
-- Oblivion Remastered-backed builds should define `NL_UI_HOST_OBLIVION_REMASTERED`.
+- Oblivion Remastered-backed builds define `NL_UI_HOST_OBLIVION_REMASTERED`.
 - Consumers can call the optional `GetUIPlatformHostInfo()` export through
   `DllLoader`, or use `APIMessageType::RequestHostInfo` in message-based integrations.
 
@@ -42,7 +40,7 @@ Remastered implementation.
 Before replacing the placeholder backend:
 
 - preserve upstream MIT license and credits
-- separate generic CEF code from Skyrim/SKSE-specific code
+- separate generic CEF code from the remaining upstream Skyrim/SKSE scaffolding
 - verify render hook compatibility with Oblivion Remastered's renderer path
 - map cursor and keyboard focus to UE5/CommonUI behavior
 - make CEF subprocess cleanup reliable on normal exit and crash exit

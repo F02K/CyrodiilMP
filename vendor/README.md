@@ -23,8 +23,9 @@ https://github.com/kkEngine/NirnLabUIPlatform
 
 Upstream license: MIT. Keep the upstream `LICENSE` file and credit intact in
 the fork.
-Oblivion Remastered-specific changes should be documented in
-`vendor/NirnLabUIPlatform/OBLIVION_REMASTERED.md`.
+The fork is now an Oblivion Remastered-only porting target; Skyrim/SKSE
+compatibility does not need to be preserved. Oblivion Remastered-specific
+changes should be documented in `vendor/NirnLabUIPlatform/OBLIVION_REMASTERED.md`.
 
 The RE-UE4SS-based paths currently depend on the Unreal pseudo-source submodule at `deps/first/Unreal`.
 At the time of writing, the submodule URL in upstream metadata is:
