@@ -18,9 +18,9 @@ The first playable milestone is intentionally small:
 
 - `docs/` - design notes, tool choices, architecture decisions.
 - `research/` - reverse engineering notes, UE5 runtime notes, packet/state sync experiments.
-- `client/` - short-lived client bridge launched from UE4SS for the first connect MVP.
+- `client/` - retired/experimental managed bridge used by early menu-connect smoke tests.
 - `game-plugin/` - Remastered-side mod/plugin assets, UE project notes, pak/mod packaging experiments.
-- `native/` - standalone native GameClient DLL, launcher/bootstrap loader, plus optional UE4SS C++ GameHost.
+- `native/` - standalone native GameClient DLL plus owned launcher/bootstrap loader.
 - `server/` - authoritative multiplayer server prototype.
 - `shared/` - protocol schemas, shared constants, serialization formats.
 - `scripts/` - build, packaging, and developer utility scripts.
@@ -40,7 +40,7 @@ Use the helper scripts to collect initial UE5/game-folder data without modifying
 .\scripts\install-cyrodiilmp-ue4ss-mods.cmd
 ```
 
-See `scripts/README.md` for the full helper list, `docs/PROJECT_STRUCTURE.md` for runtime ownership boundaries, `docs/REPOSITORY_ORGANIZATION.md` for the repo cleanup map, `docs/STANDALONE_LOADER.md` for the owned native loader path, `docs/BUILD_AND_BRIDGE.md` for the organized build/client-bridge flow, `docs/NATIVE_GAMECLIENT.md` for the standalone native GameClient, and `docs/NATIVE_GAMEHOST.md` for the optional UE4SS C++ mod path.
+UE4SS helpers are research/dumper tooling only. See `scripts/README.md` for the full helper list, `docs/PROJECT_STRUCTURE.md` for runtime ownership boundaries, `docs/REPOSITORY_ORGANIZATION.md` for the repo cleanup map, `docs/STANDALONE_LOADER.md` for the owned native loader path, `docs/NATIVE_GAMECLIENT.md` for the standalone native GameClient, `docs/UE4SS_RESEARCH.md` for UE4SS scope, and `docs/NATIVE_GAMEHOST.md` for the retired UE4SS C++ mod path.
 
 ## License And Rights
 

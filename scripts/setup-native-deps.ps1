@@ -43,8 +43,7 @@ RE-UE4SS depends on Unreal pseudo-source access. Link your GitHub account to you
 If you do not use GitHub SSH keys, rerun with:
   .\scripts\setup-native-deps.cmd -UseHttpsSubmodules
 
-You can also point the build at an already-working RE-UE4SS checkout:
-  .\scripts\build-native.cmd -Configuration Release -Ue4ssRoot "D:\src\RE-UE4SS"
+RE-UE4SS is no longer part of the CyrodiilMP native runtime build. Keep this checkout only for historical UE4SS C++ research.
 '@
 }
 
@@ -82,8 +81,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $ue4ssRoot 'CMakeLists.txt') -PathTy
 }
 
 Write-Host ''
-Write-Host 'Native dependency setup complete.'
+Write-Host 'RE-UE4SS research checkout setup complete.'
 Write-Host "UE4SS_ROOT: $ue4ssRoot"
 Write-Host ''
-Write-Host 'Next:'
-Write-Host '  .\scripts\build-native.cmd -Configuration Release'
+Write-Host 'Note: CyrodiilMP runtime builds no longer consume this checkout.'

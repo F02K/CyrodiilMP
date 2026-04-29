@@ -1,15 +1,14 @@
 # UI Platform Integration
 
-CyrodiilMP owns a small UI API boundary in `native/CyrodiilMP.GameHost/src/UiRuntime.*`.
+CyrodiilMP owns a small UI API boundary for the standalone launcher/bootstrap path.
 The NirnLabUIPlatform source is referenced as a submodule under `vendor/NirnLabUIPlatform` and should plug in behind that boundary instead of becoming a direct dependency of gameplay or networking code.
 
 ## Current Slice
 
-- `CyrodiilMP.GameHost` initializes `UiRuntime` during `on_unreal_init`.
-- The MULTIPLAYER main-menu click asks `UiRuntime` to show `cyrodiilmp.main-menu`.
-- Until an interactive backend is present, the click keeps the existing bridge fallback.
+- The previous UE4SS `CyrodiilMP.GameHost` UI path is retired.
+- UI runtime work should move into the owned launcher/bootstrap native path.
+- UE4SS may still be used for dumps and runtime inspection, but not for game UI ownership.
 - Static web assets live in `game-plugin/UI/cyrodiilmp`.
-- The installer copies those assets to `OblivionRemastered/Binaries/Win64/CyrodiilMP/UI`.
 - NirnLabUIPlatform points at the `F02K/NirnLabUIPlatform` fork on the `oblivion-remastered-host` branch, with Oblivion Remastered patch notes in `vendor/NirnLabUIPlatform/OBLIVION_REMASTERED.md`.
 
 ## Runtime Contract
@@ -24,7 +23,7 @@ The native side exposes these operations:
 The first JavaScript commands are:
 
 - `cyrodiilmp.connect`
-- `cyrodiilmp.disconnect` (registered as a stub until GameHost calls GameClient directly)
+- `cyrodiilmp.disconnect`
 - `cyrodiilmp.close`
 
 ## Host Detection
@@ -53,11 +52,11 @@ Before replacing the placeholder backend:
 
 ```text
 MULTIPLAYER click
-  -> GameHost HookManager
+  -> owned native launcher/bootstrap UI hook
   -> UiRuntime.ShowView("cyrodiilmp.main-menu")
   -> HTML/JS connect form
   -> JS command "cyrodiilmp.connect"
-  -> GameHost command handler
+  -> native UI command handler
   -> GameClient C ABI
   -> server connect/status
   -> UiRuntime.SendEvent("statusChanged", ...)

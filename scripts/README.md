@@ -147,23 +147,16 @@ Indexes text/JSON exports from FModel and extracts likely `/Game`, `/Script`, UI
 .\scripts\index-fmodel-export.cmd -ExportPath "D:\FModelExports\OblivionMenu" -Name main-menu-pass
 ```
 
-## Install CyrodiilMP UE4SS Mods
+## Install CyrodiilMP UE4SS Research Helpers
 
-Installs the runtime inspector and the GameClient Lua bootstrap into the UE4SS `Mods` folder. It also copies the built standalone native GameClient into the game `Win64\CyrodiilMP\GameClient` folder.
-
-The bootstrap only loads `CyrodiilMP.GameClient.dll`. UI edits are intentionally kept out of Lua; the native UE4SS GameHost owns menu relabeling once RE-UE4SS dependencies are available.
+Installs UE4SS research/dumper helpers into the UE4SS `Mods` folder.
+This is for runtime inspection and data collection only; it does not install or load the multiplayer runtime.
 
 ```powershell
 .\scripts\install-cyrodiilmp-ue4ss-mods.cmd
 ```
 
 After launching the game, runtime dumps should appear in the game `Win64\CyrodiilMP_RuntimeDumps` folder.
-
-The optional UE4SS C++ GameHost is not installed by default. If you build that experimental path later, install it explicitly:
-
-```powershell
-.\scripts\install-cyrodiilmp-ue4ss-mods.cmd -IncludeUe4ssGameHost
-```
 
 ## Collect Runtime Dumps
 
@@ -273,31 +266,9 @@ F:\Steam\steamapps\common\Oblivion Remastered\OblivionRemastered\Binaries\Win64\
 EnableUEPatternScan=true
 ```
 
-To also build the C++ UE4SS GameHost mod, first install the RE-UE4SS dependency:
-
-```powershell
-.\scripts\setup-native-deps.cmd
-```
-
-To track it as a git submodule instead of a plain local vendor checkout:
-
-```powershell
-.\scripts\setup-native-deps.cmd -AsSubmodule
-```
-
-```powershell
-.\scripts\build-native.cmd -Configuration Release -BuildUe4ssGameHost
-```
-
-If RE-UE4SS is not under `vendor\RE-UE4SS`, pass it explicitly:
-
-```powershell
-.\scripts\build-native.cmd -Configuration Release -Ue4ssRoot "D:\src\RE-UE4SS"
-```
-
 ## Check UE4SS C++ Template
 
-Clones/checks the official UE4SS C++ template and verifies whether its `UEPseudo` dependency is reachable.
+Historical helper that checks the official UE4SS C++ template and verifies whether its `UEPseudo` dependency is reachable.
 
 ```powershell
 .\scripts\check-ue4ss-cpp-template.cmd
@@ -316,13 +287,13 @@ Tests the standalone native DLL against the server raw UDP sidecar.
 
 ## Publish Client Bridge
 
-Publishes the short-lived client executable used by the UE4SS main-menu click hook.
+Publishes the retired short-lived client executable used by early menu-connect smoke tests.
 
 ```powershell
 .\scripts\publish-client-bridge.cmd
 ```
 
-`install-cyrodiilmp-ue4ss-mods.cmd` also publishes and installs this bridge into the game `Win64\CyrodiilMP\ClientBridge` folder by default.
+The UE4SS research helper installer no longer publishes or installs this bridge.
 
 ## Run Client Bridge Manually
 

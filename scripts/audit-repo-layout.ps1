@@ -8,10 +8,10 @@ $projectRoot = Resolve-Path (Join-Path $PSScriptRoot '..')
 $folders = @(
     [PSCustomObject]@{ Path = 'server'; Category = 'active-source'; Note = 'Dedicated server prototype.' },
     [PSCustomObject]@{ Path = 'shared'; Category = 'active-source'; Note = 'Shared protocol contracts.' },
-    [PSCustomObject]@{ Path = 'native'; Category = 'active-source'; Note = 'Standalone runtime, launcher, native GameClient, optional UE4SS C++ work.' },
+    [PSCustomObject]@{ Path = 'native'; Category = 'active-source'; Note = 'Standalone runtime, launcher, native GameClient, and future owned UI work.' },
     [PSCustomObject]@{ Path = 'client'; Category = 'active-source/transitional'; Note = 'Managed bridge for early smoke tests.' },
     [PSCustomObject]@{ Path = 'dashboard'; Category = 'active-source/tooling'; Note = 'Local research dashboard.' },
-    [PSCustomObject]@{ Path = 'game-plugin'; Category = 'active-source/research'; Note = 'UE4SS Lua research/bootstrap mods.' },
+    [PSCustomObject]@{ Path = 'game-plugin'; Category = 'active-source/research'; Note = 'UE4SS Lua research and dumper helpers.' },
     [PSCustomObject]@{ Path = 'scripts'; Category = 'active-source/tooling'; Note = 'Reusable developer commands.' },
     [PSCustomObject]@{ Path = 'build'; Category = 'active-source/tooling'; Note = 'Build/publish helper scripts. Not generated output.' },
     [PSCustomObject]@{ Path = 'docs'; Category = 'active-source/docs'; Note = 'Project documentation.' },
