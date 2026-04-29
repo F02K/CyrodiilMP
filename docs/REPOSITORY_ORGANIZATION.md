@@ -6,10 +6,10 @@ CyrodiilMP has three different kinds of folders right now: source, local/generat
 
 - `server/` - dedicated server and raw UDP sidecar.
 - `shared/` - protocol code and shared notes.
-- `native/` - standalone injected runtime, native client DLL, launcher, and optional UE4SS C++ experiments.
-- `client/` - short-lived managed bridge used by early UE4SS/menu experiments.
+- `native/` - standalone injected runtime, native client DLL, launcher, and future owned UI integration.
+- `client/` - retired/experimental managed bridge used by early menu-connect smoke tests.
 - `dashboard/` - local web dashboard for research and helper execution.
-- `game-plugin/` - UE4SS Lua research/bootstrap mods and game-side mod packaging experiments.
+- `game-plugin/` - UE4SS Lua research/dumper mods and game-side mod packaging experiments.
 - `scripts/` - developer entry points. Prefer adding script wrappers here instead of one-off commands in docs.
 - `build/` - repo build/publish PowerShell internals, not generated build output.
 - `docs/` - architecture and workflow decisions.
@@ -25,8 +25,8 @@ These should not be treated as source and are ignored by git.
 - `.dotnet-home/` - local .NET/NuGet cache.
 - `tools/FModel/current/` - local downloaded FModel install.
 - `tools/UE4SS/current/` - local downloaded UE4SS install.
-- `vendor/RE-UE4SS/` - local dependency checkout.
-- `vendor/UE4SSCPPTemplate/` - local template experiment.
+- `vendor/RE-UE4SS/` - local research dependency checkout, not part of the runtime path.
+- `vendor/UE4SSCPPTemplate/` - local historical template experiment.
 
 These can usually be regenerated. Do not commit their contents.
 
@@ -47,9 +47,8 @@ Keep useful written notes. Generated CSV/JSON/log dumps should stay ignored unle
 
 ## Experimental Or Legacy Areas
 
-- `native/CyrodiilMP.GameHost/` is optional UE4SS C++ work. It is blocked by upstream RE-UE4SS/UEPseudo availability, so it should not block the standalone MVP.
-- `game-plugin/UE4SS/Mods/CyrodiilMP_ConnectButtonPrototype/` is a retired Lua prototype. Keep it only as historical reference until we decide to remove old experiments.
-- `client/CyrodiilMP.ClientBridge/` is useful for early smoke tests, but the long-term path should be native `GameClient` plus standalone bootstrap.
+- `game-plugin/UE4SS/Mods/CyrodiilMP_ConnectButtonPrototype/` and `CyrodiilMP_GameClientBootstrap/` are retired Lua runtime prototypes.
+- `client/CyrodiilMP.ClientBridge/` is useful only for historical smoke tests; the runtime path is native `GameClient` plus standalone bootstrap.
 
 ## Cleanup Policy
 

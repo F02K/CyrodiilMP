@@ -2,7 +2,7 @@
 
 `CyrodiilMP.GameClient` is a standalone native C++ DLL. It does not depend on RE-UE4SS.
 
-This is the replacement path for making the real client runtime native while keeping UE4SS Lua/C++ only as loaders and research tooling.
+This is the runtime client path. UE4SS is research/dumper tooling only and should not load or own the real client.
 
 ## Build
 
@@ -21,14 +21,6 @@ Output:
 artifacts\native\Release\GameClient
 ```
 
-To also build the UE4SS C++ GameHost mod, pass:
-
-```powershell
-.\scripts\build-native.cmd -Configuration Release -BuildUe4ssGameHost
-```
-
-That optional path still requires RE-UE4SS source.
-
 ## Install
 
 Build the native GameClient first:
@@ -37,27 +29,27 @@ Build the native GameClient first:
 .\scripts\build-native.cmd -Configuration Release
 ```
 
-Then install the UE4SS research tooling and copy the GameClient into the game folder:
+Then install the standalone loader path:
+
+```powershell
+.\scripts\install-standalone-loader.cmd -Configuration Release
+```
+
+Install UE4SS research helpers separately only when collecting dumps or runtime data:
 
 ```powershell
 .\scripts\install-cyrodiilmp-ue4ss-mods.cmd
 ```
 
-The installer does not require or warn about the optional UE4SS C++ GameHost. To install that experimental path later, pass:
-
-```powershell
-.\scripts\install-cyrodiilmp-ue4ss-mods.cmd -IncludeUe4ssGameHost
-```
-
 ## Game Startup Loading
 
-`CyrodiilMP.GameClient.dll` does not load itself just because it exists in the game folder. The UE4SS Lua bootstrap loads it with `package.loadlib` from:
+`CyrodiilMP.GameClient.dll` does not load itself just because it exists in the game folder. The standalone bootstrap loads it from:
 
 ```text
 OblivionRemastered\Binaries\Win64\CyrodiilMP\GameClient\CyrodiilMP.GameClient.dll
 ```
 
-The DLL exports `luaopen_CyrodiilMP_GameClient`, which starts the GameClient menu command watcher. The UE4SS Lua bootstrap only loads the DLL. UI edits, including Credits -> Multiplayer, belong in the native UE4SS GameHost path because the packaged UE4SS runtime does not export the Lua C API needed for a plain DLL to safely call UE4SS Lua functions itself.
+The old `luaopen_CyrodiilMP_GameClient` export remains for historical smoke tests, but it is not the runtime loading path.
 
 ## First Native Server Proof
 
@@ -104,6 +96,6 @@ const char* CyrodiilMP_GetVersion();
 
 Next loader options:
 
-- Call these exports from a UE4SS C++ GameHost once RE-UE4SS is available.
-- Load the DLL through a small custom loader/proxy later.
-- Keep Lua only as a temporary launcher while C++ ownership grows.
+- Call these exports from `CyrodiilMP.Bootstrap`.
+- Add UI/NirnLab command routing in an owned native module.
+- Keep UE4SS out of runtime loading.

@@ -9,7 +9,7 @@ CyrodiilMP is still early, so the most important rule is to keep experiments fro
 - `native/CyrodiilMP.GameClient/` - native client networking/runtime helper DLL. This owns server connection behavior, command watching, and later transform send/receive calls exposed to the game runtime.
 - `native/CyrodiilMP.Bootstrap/` - injected standalone DLL. This owns process startup, settings, UE runtime discovery, and loading `CyrodiilMP.GameClient.dll`.
 - `native/CyrodiilMP.Launcher/` - small process launcher/injector. This should stay dumb and not contain game logic.
-- `game-plugin/UE4SS/` - research/bootstrap-only UE4SS Lua assets. This should not own final gameplay behavior.
+- `game-plugin/UE4SS/` - research/dumper-only UE4SS Lua assets. This should not own runtime loading, UI, networking, or final gameplay behavior.
 
 ## Bootstrap Source Layout
 
@@ -27,7 +27,7 @@ CyrodiilMP is still early, so the most important rule is to keep experiments fro
 - Keep raw pattern definitions in `UEPatterns.*`; do not scatter signatures through gameplay code.
 - Add a separate `UEObjectRuntime.*` when we start reading `GUObjectArray`, names, objects, worlds, or pawns.
 - Add a separate `PlayerTransformProbe.*` for local pawn transform reads before connecting that data to networking.
-- Keep UI work out of the transform-sync path. Menu or overlay work should live in its own module after the player-position MVP is stable.
+- Keep UI work out of the transform-sync path. Menu or overlay work should live in an owned native module under the launcher/bootstrap path after the player-position MVP is stable.
 
 ## Current MVP Flow
 

@@ -101,7 +101,7 @@ app.MapPost("/api/actions/install-ue4ss-mods", (GamePathRequest request) =>
     return StartDashboardJob(
         root,
         jobState,
-        "Install UE4SS mods",
+        "Install UE4SS research helpers",
         Path.Combine(root, "scripts", "install-cyrodiilmp-ue4ss-mods.ps1"),
         BuildNamedArgs(
             ("-GamePath", request.GamePath)));
@@ -524,8 +524,7 @@ static object BuildUe4ssInstallState(string root, string gamePath)
 {
     var requiredMods = new[]
     {
-        "CyrodiilMP_RuntimeInspector",
-        "CyrodiilMP_ConnectButtonPrototype"
+        "CyrodiilMP_RuntimeInspector"
     };
 
     if (string.IsNullOrWhiteSpace(gamePath))
@@ -538,7 +537,6 @@ static object BuildUe4ssInstallState(string root, string gamePath)
             readyToInstall = false,
             gamePath = "",
             modsPath = "",
-            bridgePath = "",
             enabledPath = "",
             details = new[]
             {
@@ -552,7 +550,6 @@ static object BuildUe4ssInstallState(string root, string gamePath)
     var win64Path = Path.Combine(trimmedGamePath, "OblivionRemastered", "Binaries", "Win64");
     var paksPath = Path.Combine(trimmedGamePath, "OblivionRemastered", "Content", "Paks");
     var modsPath = Path.Combine(win64Path, "Mods");
-    var bridgePath = Path.Combine(win64Path, "CyrodiilMP", "ClientBridge");
     var modsListPath = Path.Combine(modsPath, "mods.txt");
     var looksLikeInstallRoot = Directory.Exists(gameRootPath) &&
         (Directory.Exists(win64Path) || Directory.Exists(paksPath));
@@ -578,9 +575,6 @@ static object BuildUe4ssInstallState(string root, string gamePath)
                 : modScriptPath));
     }
 
-    var bridgeExePath = Path.Combine(bridgePath, "CyrodiilMP.ClientBridge.exe");
-    details.Add(CreateInstallDetail("Client bridge", File.Exists(bridgeExePath), bridgeExePath));
-
     var missing = details.Where(detail => !detail.Ok).Select(detail => detail.Name).ToArray();
     var installed = missing.Length == 0;
 
@@ -592,7 +586,6 @@ static object BuildUe4ssInstallState(string root, string gamePath)
         readyToInstall = looksLikeInstallRoot,
         gamePath = trimmedGamePath,
         modsPath,
-        bridgePath,
         modsListPath,
         details
     };

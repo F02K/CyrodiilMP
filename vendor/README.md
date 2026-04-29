@@ -2,11 +2,11 @@
 
 Third-party source checkouts live here locally and are intentionally ignored by git.
 
-Current optional native UI experiments may use:
+Current optional native UI and research experiments may use:
 
-- `vendor/RE-UE4SS`
-- `vendor/UE4SSCPPTemplate`
 - `vendor/NirnLabUIPlatform`
+- `vendor/RE-UE4SS` for historical/research-only UE4SS C++ investigation
+- `vendor/UE4SSCPPTemplate` for historical UE4SS C++ template investigation
 
 `vendor/NirnLabUIPlatform` is a Git submodule pointing at the F02K fork:
 
@@ -23,8 +23,9 @@ https://github.com/kkEngine/NirnLabUIPlatform
 
 Upstream license: MIT. Keep the upstream `LICENSE` file and credit intact in
 the fork.
-Oblivion Remastered-specific changes should be documented in
-`vendor/NirnLabUIPlatform/OBLIVION_REMASTERED.md`.
+The fork is now an Oblivion Remastered-only porting target; Skyrim/SKSE
+compatibility does not need to be preserved. Oblivion Remastered-specific
+changes should be documented in `vendor/NirnLabUIPlatform/OBLIVION_REMASTERED.md`.
 
 The RE-UE4SS-based paths currently depend on the Unreal pseudo-source submodule at `deps/first/Unreal`.
 At the time of writing, the submodule URL in upstream metadata is:
@@ -33,4 +34,4 @@ At the time of writing, the submodule URL in upstream metadata is:
 git@github.com:Re-UE4SS/UEPseudo.git
 ```
 
-That repository is not publicly reachable from this machine, so the UE4SS C++ GameHost path cannot finish building until a working replacement or populated checkout is provided.
+That repository is not publicly reachable from this machine. CyrodiilMP no longer uses an RE-UE4SS C++ runtime path, so keep this checkout only for historical research.
