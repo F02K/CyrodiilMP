@@ -218,11 +218,35 @@ Builds the shared protocol library, server, client bridge, probe, and dashboard.
 
 ## Build Native GameClient
 
-Builds the standalone native GameClient DLL and test host. This does not require RE-UE4SS.
+Builds the standalone native GameClient DLL, test host, and the new standalone loader/bootstrap. This does not require RE-UE4SS.
 
 ```powershell
 .\scripts\build-native.cmd -Configuration Release
 ```
+
+## Install Standalone Loader
+
+Installs the native GameClient plus `CyrodiilMP.Bootstrap.dll` and `CyrodiilMP.Launcher.exe` into the game `Win64\CyrodiilMP` folder.
+
+```powershell
+.\scripts\install-standalone-loader.cmd -GamePath "F:\Steam\steamapps\common\Oblivion Remastered"
+```
+
+## Run Standalone Loader
+
+Launches Oblivion Remastered through our own injector instead of relying on UE4SS to load the client.
+
+```powershell
+.\scripts\run-standalone-loader.cmd -GamePath "F:\Steam\steamapps\common\Oblivion Remastered"
+```
+
+To inject into an already running game process:
+
+```powershell
+.\scripts\run-standalone-loader.cmd -GamePath "F:\Steam\steamapps\common\Oblivion Remastered" -Existing
+```
+
+See `docs\STANDALONE_LOADER.md` for the current architecture and next UE bridge steps.
 
 To also build the C++ UE4SS GameHost mod, first install the RE-UE4SS dependency:
 

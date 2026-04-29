@@ -20,7 +20,7 @@ The first playable milestone is intentionally small:
 - `research/` - reverse engineering notes, UE5 runtime notes, packet/state sync experiments.
 - `client/` - short-lived client bridge launched from UE4SS for the first connect MVP.
 - `game-plugin/` - Remastered-side mod/plugin assets, UE project notes, pak/mod packaging experiments.
-- `native/` - standalone native GameClient DLL plus optional UE4SS C++ GameHost.
+- `native/` - standalone native GameClient DLL, launcher/bootstrap loader, plus optional UE4SS C++ GameHost.
 - `server/` - authoritative multiplayer server prototype.
 - `shared/` - protocol schemas, shared constants, serialization formats.
 - `scripts/` - build, packaging, and developer utility scripts.
@@ -40,7 +40,7 @@ Use the helper scripts to collect initial UE5/game-folder data without modifying
 .\scripts\install-cyrodiilmp-ue4ss-mods.cmd
 ```
 
-See `scripts/README.md` for the full helper list, `docs/BUILD_AND_BRIDGE.md` for the organized build/client-bridge flow, `docs/NATIVE_GAMECLIENT.md` for the standalone native path, and `docs/NATIVE_GAMEHOST.md` for the optional UE4SS C++ mod path.
+See `scripts/README.md` for the full helper list, `docs/STANDALONE_LOADER.md` for the owned native loader path, `docs/BUILD_AND_BRIDGE.md` for the organized build/client-bridge flow, `docs/NATIVE_GAMECLIENT.md` for the standalone native GameClient, and `docs/NATIVE_GAMEHOST.md` for the optional UE4SS C++ mod path.
 
 ## License And Rights
 

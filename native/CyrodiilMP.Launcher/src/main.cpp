@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <iostream>
 #include <optional>
+#include <stdexcept>
 #include <string>
 #include <vector>
 

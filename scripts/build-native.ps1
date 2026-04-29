@@ -50,6 +50,8 @@ finally {
 $dllPath = Join-Path $projectRoot "game-plugin\UE4SS\Mods\CyrodiilMP.GameHost\dlls\main.dll"
 $gameClientDll = Join-Path $projectRoot "artifacts\native\$Configuration\GameClient\CyrodiilMP.GameClient.dll"
 $gameClientHost = Join-Path $projectRoot "artifacts\native\$Configuration\GameClient\CyrodiilMP.GameClient.Host.exe"
+$standaloneBootstrapDll = Join-Path $projectRoot "artifacts\native\$Configuration\Standalone\CyrodiilMP.Bootstrap.dll"
+$standaloneLauncherExe = Join-Path $projectRoot "artifacts\native\$Configuration\Standalone\CyrodiilMP.Launcher.exe"
 
 if (Test-Path -LiteralPath $gameClientDll -PathType Leaf) {
     Write-Host ''
@@ -57,6 +59,16 @@ if (Test-Path -LiteralPath $gameClientDll -PathType Leaf) {
     Write-Host "GameClient host: $gameClientHost"
 } else {
     Write-Warning "Build finished but CyrodiilMP.GameClient.dll was not found at $gameClientDll"
+}
+
+if ((Test-Path -LiteralPath $standaloneBootstrapDll -PathType Leaf) -and (Test-Path -LiteralPath $standaloneLauncherExe -PathType Leaf)) {
+    Write-Host ''
+    Write-Host "Standalone bootstrap build succeeded: $standaloneBootstrapDll"
+    Write-Host "Standalone launcher: $standaloneLauncherExe"
+    Write-Host 'Install it with:'
+    Write-Host "  .\scripts\install-standalone-loader.ps1 -Configuration $Configuration"
+} else {
+    Write-Warning "Build finished but standalone loader outputs were not found under artifacts\native\$Configuration\Standalone"
 }
 
 if ($BuildUe4ssGameHost) {

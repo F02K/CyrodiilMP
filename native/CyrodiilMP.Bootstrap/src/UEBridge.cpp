@@ -38,7 +38,6 @@ void UEBridge::CaptureStartupSnapshot()
         return;
     }
 
-    MODULEINFO info{};
     // Avoid depending on psapi.lib for now; use the PE headers for a light startup snapshot.
     const auto base = reinterpret_cast<uintptr_t>(module);
     const auto* dos = reinterpret_cast<const IMAGE_DOS_HEADER*>(base);
