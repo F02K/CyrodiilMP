@@ -27,10 +27,17 @@ OblivionRemastered/Binaries/Win64/CyrodiilMP/
 Bootstrap settings:
 
 ```ini
+[Debug]
+EnableConsole=true
+
 [UI]
 EnableNirnLabUI=true
 ShowMainMenuButton=true
 ```
+
+`EnableConsole` currently defaults to `true` so the standalone bootstrap opens a
+native debug console and mirrors `Bootstrap.log` messages while the UI host is
+being integrated. Set it to `false` to hide the console on the next launch.
 
 The current button view is a first host integration slice. It proves that
 Bootstrap can load NirnLabUIPlatformOR, create a browser, bind

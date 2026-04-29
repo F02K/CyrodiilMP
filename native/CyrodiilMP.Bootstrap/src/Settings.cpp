@@ -62,9 +62,13 @@ void EnsureSettingsFile(const std::filesystem::path& settings_path)
     std::ofstream output(settings_path, std::ios::binary | std::ios::trunc);
     output
         << "# CyrodiilMP standalone bootstrap settings\n"
+        << "# Set EnableConsole=false to hide the native debug console.\n"
         << "# Set EnableUEPatternScan=false if a game update makes startup scanning unstable.\n"
         << "# Set EnableNirnLabUI=false to disable the Chromium UI backend.\n"
         << "# Set ShowMainMenuButton=false to keep the backend available but hide the prototype menu button.\n"
+        << "[Debug]\n"
+        << "EnableConsole=true\n"
+        << "\n"
         << "[UEBridge]\n"
         << "EnableUEPatternScan=true\n"
         << "\n"
@@ -114,7 +118,11 @@ BootstrapSettings LoadSettings(const std::filesystem::path& settings_path)
 
         auto key = ToLower(Trim(line.substr(0, equals)));
         auto value = Trim(line.substr(equals + 1));
-        if (section == "uebridge" && key == "enableuepatternscan")
+        if (section == "debug" && key == "enableconsole")
+        {
+            settings.enable_debug_console = ParseBool(value, settings.enable_debug_console);
+        }
+        else if (section == "uebridge" && key == "enableuepatternscan")
         {
             settings.enable_ue_pattern_scan = ParseBool(value, settings.enable_ue_pattern_scan);
         }

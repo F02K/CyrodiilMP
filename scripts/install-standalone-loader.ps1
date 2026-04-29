@@ -49,9 +49,13 @@ $settingsPath = Join-Path $targetBootstrapLogPath 'settings.ini'
 if (-not (Test-Path -LiteralPath $settingsPath -PathType Leaf)) {
     @(
         '# CyrodiilMP standalone bootstrap settings'
+        '# Set EnableConsole=false to hide the native debug console.'
         '# Set EnableUEPatternScan=false if a game update makes startup scanning unstable.'
         '# Set EnableNirnLabUI=false to disable the Chromium UI backend.'
         '# Set ShowMainMenuButton=false to keep the backend available but hide the prototype menu button.'
+        '[Debug]'
+        'EnableConsole=true'
+        ''
         '[UEBridge]'
         'EnableUEPatternScan=true'
         ''

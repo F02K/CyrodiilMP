@@ -1,5 +1,6 @@
 #include "Bootstrap.hpp"
 
+#include "DebugConsole.hpp"
 #include "Log.hpp"
 #include "Settings.hpp"
 #include "UiRuntime.hpp"
@@ -52,13 +53,15 @@ DWORD WINAPI WorkerThread(LPVOID)
     const auto game_client_dll = game_client_dir / "CyrodiilMP.GameClient.dll";
 
     Log::Initialize(bootstrap_log);
+    const auto settings_path = bootstrap_dir / "settings.ini";
+    const auto settings = LoadSettings(settings_path);
+
+    DebugConsole::Initialize(settings.enable_debug_console);
+
     Log::Write("CyrodiilMP.Bootstrap loaded");
     Log::Write("bootstrap_dll=" + GetModulePath(g_self_module).string());
     Log::Write("game_exe=" + GetGameExePath().string());
     Log::Write("win64_dir=" + win64_dir.string());
-
-    const auto settings_path = bootstrap_dir / "settings.ini";
-    const auto settings = LoadSettings(settings_path);
     Log::Write("settings=" + settings_path.string());
 
     UEBridge::Initialize(GetGameExePath(), UEBridgeSettings{
@@ -134,6 +137,8 @@ void Stop()
         CloseHandle(g_worker_thread);
         g_worker_thread = nullptr;
     }
+
+    DebugConsole::Shutdown();
 }
 
 }

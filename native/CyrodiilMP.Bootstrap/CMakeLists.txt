@@ -3,6 +3,7 @@ set(TARGET CyrodiilMP.Bootstrap)
 
 add_library(${TARGET} SHARED
     src/Bootstrap.cpp
+    src/DebugConsole.cpp
     src/DllMain.cpp
     src/Log.cpp
     src/PatternScanner.cpp
