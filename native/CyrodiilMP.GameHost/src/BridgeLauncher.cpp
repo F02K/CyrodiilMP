@@ -10,6 +10,7 @@
 #include <queue>
 #include <string>
 #include <thread>
+#include <cstring>
 
 // Windows API for CreateProcess and file I/O.
 #define WIN32_LEAN_AND_MEAN
@@ -56,16 +57,27 @@ static void Enqueue(BridgeResult result)
 // Minimal JSON pattern match — avoids a full JSON parser dependency.
 static bool JsonBool(const std::string& json, const char* key)
 {
-    auto needle = std::string("\"") + key + "\":true";
-    return json.find(needle) != std::string::npos;
+    auto prefix = std::string("\"") + key + "\"";
+    auto pos = json.find(prefix);
+    if (pos == std::string::npos) return false;
+
+    auto colon = json.find(':', pos + prefix.size());
+    if (colon == std::string::npos) return false;
+
+    auto value = json.find_first_not_of(" \t\r\n", colon + 1);
+    return value != std::string::npos && json.compare(value, 4, "true") == 0;
 }
 
 static int JsonInt(const std::string& json, const char* key)
 {
-    auto prefix = std::string("\"") + key + "\":";
+    auto prefix = std::string("\"") + key + "\"";
     auto pos = json.find(prefix);
     if (pos == std::string::npos) return 0;
-    pos += prefix.size();
+    auto colon = json.find(':', pos + prefix.size());
+    if (colon == std::string::npos) return 0;
+    pos = json.find_first_not_of(" \t\r\n", colon + 1);
+    if (pos == std::string::npos) return 0;
+
     int value = 0;
     try { value = std::stoi(json.substr(pos)); } catch (...) {}
     return value;
@@ -134,7 +146,7 @@ static void RunBridge()
     CloseHandle(hFile);
 
     bool success  = JsonBool(json, "Success");
-    int  playerId = JsonInt(json,  "PlayerId");
+    int  playerId = JsonInt(json,  "AssignedPlayerId");
 
     Enqueue({success, playerId, success ? "" : json});
     s_launchInFlight = false;
@@ -193,8 +205,9 @@ void DrainResultQueue()
                         bool                bWriteToLog{false};
                         RC::Unreal::FString ReturnValue;
                     } params;
-                    params.Command = RC::Unreal::FString(STR("open ") + std::wstring(
-                        WORLD_MAP, WORLD_MAP + strlen(WORLD_MAP)));
+                    std::wstring command = STR("open ");
+                    command += std::wstring(WORLD_MAP, WORLD_MAP + strlen(WORLD_MAP));
+                    params.Command = RC::Unreal::FString(command.c_str());
                     pc->ProcessEvent(consoleFn, &params);
 
                     CyrodiilMP_FireEvent("level.loading",

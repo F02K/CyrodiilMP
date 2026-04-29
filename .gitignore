@@ -43,6 +43,7 @@ coverage/
 # CMake / native builds
 build/*
 !build/*.ps1
+native/build/
 out/
 cmake-build-*/
 CMakeFiles/
@@ -81,6 +82,7 @@ yarn.lock
 captures/
 profiling/
 research/net-smoke/
+research/repo-audits/
 
 # Generated research data
 research/game-inventory/inventory-*.json
@@ -98,6 +100,9 @@ research/runs/*/screenshots/
 tools/**
 !tools/
 !tools/README.md
+vendor/**
+!vendor/
+!vendor/README.md
 
 # Unreal Engine / cooked game content / mod package outputs
 Saved/

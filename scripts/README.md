@@ -32,6 +32,20 @@ Open:
 http://127.0.0.1:5088
 ```
 
+## Repository Layout Audit
+
+Prints a categorized map of source, generated, local-tool, vendor, and research folders. This is non-destructive.
+
+```powershell
+.\scripts\audit-repo-layout.cmd
+```
+
+To also write a Markdown report under `research/repo-audits/`:
+
+```powershell
+.\scripts\audit-repo-layout.cmd -WriteReport
+```
+
 ## Quick Scan
 
 Creates a timestamped inventory of Oblivion Remastered files, focused on UE package files and executables.
@@ -135,13 +149,21 @@ Indexes text/JSON exports from FModel and extracts likely `/Game`, `/Script`, UI
 
 ## Install CyrodiilMP UE4SS Mods
 
-Installs the runtime inspector and connect-button prototype mods into the UE4SS `Mods` folder.
+Installs the runtime inspector and the GameClient Lua bootstrap into the UE4SS `Mods` folder. It also copies the built standalone native GameClient into the game `Win64\CyrodiilMP\GameClient` folder.
+
+The bootstrap only loads `CyrodiilMP.GameClient.dll`. UI edits are intentionally kept out of Lua; the native UE4SS GameHost owns menu relabeling once RE-UE4SS dependencies are available.
 
 ```powershell
 .\scripts\install-cyrodiilmp-ue4ss-mods.cmd
 ```
 
 After launching the game, runtime dumps should appear in the game `Win64\CyrodiilMP_RuntimeDumps` folder.
+
+The optional UE4SS C++ GameHost is not installed by default. If you build that experimental path later, install it explicitly:
+
+```powershell
+.\scripts\install-cyrodiilmp-ue4ss-mods.cmd -IncludeUe4ssGameHost
+```
 
 ## Collect Runtime Dumps
 
@@ -206,6 +228,90 @@ Builds the shared protocol library, server, client bridge, probe, and dashboard.
 
 ```powershell
 .\scripts\build.cmd -Configuration Debug
+```
+
+## Build Native GameClient
+
+Builds the standalone native GameClient DLL, test host, and the new standalone loader/bootstrap. This does not require RE-UE4SS.
+
+```powershell
+.\scripts\build-native.cmd -Configuration Release
+```
+
+## Install Standalone Loader
+
+Installs the native GameClient plus `CyrodiilMP.Bootstrap.dll` and `CyrodiilMP.Launcher.exe` into the game `Win64\CyrodiilMP` folder.
+
+```powershell
+.\scripts\install-standalone-loader.cmd -GamePath "F:\Steam\steamapps\common\Oblivion Remastered"
+```
+
+## Run Standalone Loader
+
+Launches Oblivion Remastered through our own injector instead of relying on UE4SS to load the client.
+
+```powershell
+.\scripts\run-standalone-loader.cmd -GamePath "F:\Steam\steamapps\common\Oblivion Remastered"
+```
+
+To inject into an already running game process:
+
+```powershell
+.\scripts\run-standalone-loader.cmd -GamePath "F:\Steam\steamapps\common\Oblivion Remastered" -Existing
+```
+
+See `docs\STANDALONE_LOADER.md` for the current architecture and next UE bridge steps.
+
+The UE5.3 startup scan can be toggled in the installed bootstrap settings:
+
+```text
+F:\Steam\steamapps\common\Oblivion Remastered\OblivionRemastered\Binaries\Win64\CyrodiilMP\Bootstrap\settings.ini
+```
+
+```ini
+[UEBridge]
+EnableUEPatternScan=true
+```
+
+To also build the C++ UE4SS GameHost mod, first install the RE-UE4SS dependency:
+
+```powershell
+.\scripts\setup-native-deps.cmd
+```
+
+To track it as a git submodule instead of a plain local vendor checkout:
+
+```powershell
+.\scripts\setup-native-deps.cmd -AsSubmodule
+```
+
+```powershell
+.\scripts\build-native.cmd -Configuration Release -BuildUe4ssGameHost
+```
+
+If RE-UE4SS is not under `vendor\RE-UE4SS`, pass it explicitly:
+
+```powershell
+.\scripts\build-native.cmd -Configuration Release -Ue4ssRoot "D:\src\RE-UE4SS"
+```
+
+## Check UE4SS C++ Template
+
+Clones/checks the official UE4SS C++ template and verifies whether its `UEPseudo` dependency is reachable.
+
+```powershell
+.\scripts\check-ue4ss-cpp-template.cmd
+```
+
+At the moment this still hits the same upstream blocker as full RE-UE4SS: `git@github.com:Re-UE4SS/UEPseudo.git` is not reachable from this machine.
+
+## Run Native GameClient Manually
+
+Tests the standalone native DLL against the server raw UDP sidecar.
+
+```powershell
+.\scripts\run-server.cmd -Port 27015
+.\scripts\run-native-gameclient.cmd -Port 27016
 ```
 
 ## Publish Client Bridge

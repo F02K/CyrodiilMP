@@ -11,7 +11,7 @@ GameHostMod::GameHostMod()
 {
     ModName        = STR("CyrodiilMP.GameHost");
     ModVersion     = STR("0.1.0");
-    ModDescription = STR("CyrodiilMP native game host: button injection, hooks, bridge launcher, scripting ABI.");
+    ModDescription = STR("CyrodiilMP native game host: menu relabel, hooks, bridge launcher, scripting ABI.");
     ModAuthors     = STR("CyrodiilMP");
 }
 
@@ -27,7 +27,7 @@ auto GameHostMod::on_unreal_init() -> void
 
 auto GameHostMod::on_update() -> void
 {
-    // Attempt button injection each frame until it succeeds.
+    // Attempt Credits -> MULTIPLAYER relabel each frame until it succeeds.
     // ButtonInjector::TryInject() is a no-op once it has succeeded.
     if (!m_buttonInjected.load(std::memory_order_relaxed))
     {
@@ -35,7 +35,7 @@ auto GameHostMod::on_update() -> void
         {
             m_buttonInjected.store(true, std::memory_order_relaxed);
             RC::Output::send<RC::LogLevel::Normal>(
-                STR("[CyrodiilMP.GameHost] MULTIPLAYER button injected\n"));
+                STR("[CyrodiilMP.GameHost] MULTIPLAYER menu relabel applied\n"));
         }
     }
 
