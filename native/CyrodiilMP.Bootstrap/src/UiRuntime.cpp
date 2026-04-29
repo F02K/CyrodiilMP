@@ -15,6 +15,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
+#include <system_error>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -236,6 +237,41 @@ std::filesystem::path FindUiPlatformDll(const std::filesystem::path& root_direct
     return candidates[0];
 }
 
+std::string FormatWin32Error(DWORD error)
+{
+    return std::system_category().message(static_cast<int>(error));
+}
+
+HMODULE LoadUiPlatformDll(const std::filesystem::path& dll_path, DWORD& error)
+{
+    error = ERROR_SUCCESS;
+    if (!std::filesystem::exists(dll_path))
+    {
+        error = ERROR_FILE_NOT_FOUND;
+        return nullptr;
+    }
+
+    auto* module = LoadLibraryExW(
+        dll_path.wstring().c_str(),
+        nullptr,
+        LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+    if (module != nullptr)
+    {
+        return module;
+    }
+
+    error = GetLastError();
+    module = LoadLibraryExW(dll_path.wstring().c_str(), nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
+    if (module != nullptr)
+    {
+        error = ERROR_SUCCESS;
+        return module;
+    }
+
+    error = GetLastError();
+    return nullptr;
+}
+
 }
 
 UiRuntime& UiRuntime::Instance()
@@ -249,10 +285,16 @@ bool UiRuntime::Initialize(UiRuntimeSettings settings)
     g_settings = std::move(settings);
 
     const auto dll_path = FindUiPlatformDll(g_settings.root_directory);
-    g_ui_module = LoadLibraryW(dll_path.wstring().c_str());
+    DWORD load_error = ERROR_SUCCESS;
+    g_ui_module = LoadUiPlatformDll(dll_path, load_error);
     if (g_ui_module == nullptr)
     {
-        Log::Write("UiRuntime disabled: NirnLabUIPlatformOR DLL not found path=" + dll_path.string() + " error=" + std::to_string(GetLastError()));
+        const auto exists = std::filesystem::exists(dll_path) ? "true" : "false";
+        Log::Write(
+            "UiRuntime disabled: failed to load NirnLabUIPlatformOR path=" + dll_path.string() +
+            " exists=" + exists +
+            " error=" + std::to_string(load_error) +
+            " message=" + FormatWin32Error(load_error));
         return false;
     }
 
