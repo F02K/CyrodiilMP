@@ -40,7 +40,7 @@ Use the helper scripts to collect initial UE5/game-folder data without modifying
 .\scripts\install-cyrodiilmp-ue4ss-mods.cmd
 ```
 
-See `scripts/README.md` for the full helper list, `docs/STANDALONE_LOADER.md` for the owned native loader path, `docs/BUILD_AND_BRIDGE.md` for the organized build/client-bridge flow, `docs/NATIVE_GAMECLIENT.md` for the standalone native GameClient, and `docs/NATIVE_GAMEHOST.md` for the optional UE4SS C++ mod path.
+See `scripts/README.md` for the full helper list, `docs/PROJECT_STRUCTURE.md` for runtime ownership boundaries, `docs/REPOSITORY_ORGANIZATION.md` for the repo cleanup map, `docs/STANDALONE_LOADER.md` for the owned native loader path, `docs/BUILD_AND_BRIDGE.md` for the organized build/client-bridge flow, `docs/NATIVE_GAMECLIENT.md` for the standalone native GameClient, and `docs/NATIVE_GAMEHOST.md` for the optional UE4SS C++ mod path.
 
 ## License And Rights
 

@@ -1,6 +1,7 @@
 #include "Bootstrap.hpp"
 
 #include "Log.hpp"
+#include "Settings.hpp"
 #include "UEBridge.hpp"
 
 #include <cstdint>
@@ -54,7 +55,14 @@ DWORD WINAPI WorkerThread(LPVOID)
     Log::Write("game_exe=" + GetGameExePath().string());
     Log::Write("win64_dir=" + win64_dir.string());
 
-    UEBridge::Initialize(GetGameExePath());
+    const auto settings_path = bootstrap_dir / "settings.ini";
+    const auto settings = LoadSettings(settings_path);
+    Log::Write("settings=" + settings_path.string());
+
+    UEBridge::Initialize(GetGameExePath(), UEBridgeSettings{
+        settings.enable_ue_pattern_scan,
+        bootstrap_dir
+    });
     UEBridge::CaptureStartupSnapshot();
 
     auto* loaded = LoadLibraryW(game_client_dll.wstring().c_str());

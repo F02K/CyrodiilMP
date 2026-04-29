@@ -39,6 +39,17 @@ New-Item -ItemType Directory -Path $targetGameClientPath -Force | Out-Null
 New-Item -ItemType Directory -Path $targetStandalonePath -Force | Out-Null
 New-Item -ItemType Directory -Path $targetBootstrapLogPath -Force | Out-Null
 
+$settingsPath = Join-Path $targetBootstrapLogPath 'settings.ini'
+if (-not (Test-Path -LiteralPath $settingsPath -PathType Leaf)) {
+    @(
+        '# CyrodiilMP standalone bootstrap settings'
+        '# Set EnableUEPatternScan=false if a game update makes startup scanning unstable.'
+        '[UEBridge]'
+        'EnableUEPatternScan=true'
+    ) | Set-Content -LiteralPath $settingsPath -Encoding UTF8
+    Write-Host "Created bootstrap settings -> $settingsPath"
+}
+
 if (-not $SkipGameClient) {
     $gameClientDll = Join-Path $sourceGameClientPath 'CyrodiilMP.GameClient.dll'
     if (Test-Path -LiteralPath $gameClientDll -PathType Leaf) {
@@ -62,6 +73,7 @@ $status = [PSCustomObject]@{
     GameExe = $targetExePath
     StandalonePath = $targetStandalonePath
     GameClientPath = $targetGameClientPath
+    Settings = $settingsPath
     BootstrapLog = (Join-Path $targetBootstrapLogPath 'Bootstrap.log')
 }
 $status | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $statusPath -Encoding UTF8
@@ -74,3 +86,6 @@ Write-Host ''
 Write-Host 'Logs:'
 Write-Host "  $($status.BootstrapLog)"
 Write-Host "  $(Join-Path $targetGameClientPath 'GameClient.log')"
+Write-Host ''
+Write-Host 'Pattern scan setting:'
+Write-Host "  $settingsPath"

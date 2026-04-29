@@ -32,6 +32,20 @@ Open:
 http://127.0.0.1:5088
 ```
 
+## Repository Layout Audit
+
+Prints a categorized map of source, generated, local-tool, vendor, and research folders. This is non-destructive.
+
+```powershell
+.\scripts\audit-repo-layout.cmd
+```
+
+To also write a Markdown report under `research/repo-audits/`:
+
+```powershell
+.\scripts\audit-repo-layout.cmd -WriteReport
+```
+
 ## Quick Scan
 
 Creates a timestamped inventory of Oblivion Remastered files, focused on UE package files and executables.
@@ -247,6 +261,17 @@ To inject into an already running game process:
 ```
 
 See `docs\STANDALONE_LOADER.md` for the current architecture and next UE bridge steps.
+
+The UE5.3 startup scan can be toggled in the installed bootstrap settings:
+
+```text
+F:\Steam\steamapps\common\Oblivion Remastered\OblivionRemastered\Binaries\Win64\CyrodiilMP\Bootstrap\settings.ini
+```
+
+```ini
+[UEBridge]
+EnableUEPatternScan=true
+```
 
 To also build the C++ UE4SS GameHost mod, first install the RE-UE4SS dependency:
 

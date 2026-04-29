@@ -64,10 +64,28 @@ Check these first:
 
 ```text
 F:\Steam\steamapps\common\Oblivion Remastered\OblivionRemastered\Binaries\Win64\CyrodiilMP\Bootstrap\Bootstrap.log
+F:\Steam\steamapps\common\Oblivion Remastered\OblivionRemastered\Binaries\Win64\CyrodiilMP\Bootstrap\ue-pattern-scan.json
 F:\Steam\steamapps\common\Oblivion Remastered\OblivionRemastered\Binaries\Win64\CyrodiilMP\GameClient\GameClient.log
 ```
 
-The current `UEBridge` only records the main module base and image size. The next implementation step is to add version-aware UE5.3 pattern scans for `GUObjectArray`, `FName::ToString`, `ProcessEvent`, and a path to the current `UWorld` or local player pawn transform.
+The current `UEBridge` records the main module base and runs a conservative UE5.3 pattern scan for early runtime anchors such as `GUObjectArray`, `FName::ToString`, `FName::FName(wchar_t*)`, `StaticConstructObject_Internal`, `ProcessEvent`, and `ProcessLocalScriptFunction`.
+
+## Pattern Scan Setting
+
+The scan can be toggled without rebuilding:
+
+```text
+F:\Steam\steamapps\common\Oblivion Remastered\OblivionRemastered\Binaries\Win64\CyrodiilMP\Bootstrap\settings.ini
+```
+
+```ini
+[UEBridge]
+EnableUEPatternScan=true
+```
+
+Set `EnableUEPatternScan=false` if a game update makes startup scanning unstable. The scanner only reports addresses; it does not call functions or walk UE objects yet.
+
+The bootstrap source layout is documented in `docs\PROJECT_STRUCTURE.md`.
 
 ## Multiplayer MVP Direction
 

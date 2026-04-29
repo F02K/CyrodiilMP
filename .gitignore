@@ -82,6 +82,7 @@ yarn.lock
 captures/
 profiling/
 research/net-smoke/
+research/repo-audits/
 
 # Generated research data
 research/game-inventory/inventory-*.json

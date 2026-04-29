@@ -5,7 +5,10 @@ add_library(${TARGET} SHARED
     src/Bootstrap.cpp
     src/DllMain.cpp
     src/Log.cpp
+    src/PatternScanner.cpp
+    src/Settings.cpp
     src/UEBridge.cpp
+    src/UEPatterns.cpp
 )
 
 target_include_directories(${TARGET} PRIVATE src)
