@@ -103,6 +103,7 @@ tools/**
 vendor/**
 !vendor/
 !vendor/README.md
+!vendor/NirnLabUIPlatform
 !vendor/NirnLabUIPlatform/
 !vendor/NirnLabUIPlatform/**
 

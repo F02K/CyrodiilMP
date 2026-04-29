@@ -8,14 +8,21 @@ Current optional native UI experiments may use:
 - `vendor/UE4SSCPPTemplate`
 - `vendor/NirnLabUIPlatform`
 
-`vendor/NirnLabUIPlatform` is intentionally tracked as a CyrodiilMP source fork,
-not as a local-only checkout. It starts from:
+`vendor/NirnLabUIPlatform` is a Git submodule pointing at the F02K fork:
+
+```text
+https://github.com/F02K/NirnLabUIPlatform
+```
+
+The submodule currently tracks the `oblivion-remastered-host` branch. That fork
+was created from upstream:
 
 ```text
 https://github.com/kkEngine/NirnLabUIPlatform
 ```
 
-Upstream license: MIT. Keep the upstream `LICENSE` file and credit intact.
+Upstream license: MIT. Keep the upstream `LICENSE` file and credit intact in
+the fork.
 Oblivion Remastered-specific changes should be documented in
 `vendor/NirnLabUIPlatform/OBLIVION_REMASTERED.md`.
 

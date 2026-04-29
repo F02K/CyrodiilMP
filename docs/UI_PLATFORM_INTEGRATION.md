@@ -1,7 +1,7 @@
 # UI Platform Integration
 
 CyrodiilMP owns a small UI API boundary in `native/CyrodiilMP.GameHost/src/UiRuntime.*`.
-The NirnLabUIPlatform source is vendored under `vendor/NirnLabUIPlatform` and should plug in behind that boundary instead of becoming a direct dependency of gameplay or networking code.
+The NirnLabUIPlatform source is referenced as a submodule under `vendor/NirnLabUIPlatform` and should plug in behind that boundary instead of becoming a direct dependency of gameplay or networking code.
 
 ## Current Slice
 
@@ -10,7 +10,7 @@ The NirnLabUIPlatform source is vendored under `vendor/NirnLabUIPlatform` and sh
 - Until an interactive backend is present, the click keeps the existing bridge fallback.
 - Static web assets live in `game-plugin/UI/cyrodiilmp`.
 - The installer copies those assets to `OblivionRemastered/Binaries/Win64/CyrodiilMP/UI`.
-- NirnLabUIPlatform is tracked as a local source fork with Oblivion Remastered patch notes in `vendor/NirnLabUIPlatform/OBLIVION_REMASTERED.md`.
+- NirnLabUIPlatform points at the `F02K/NirnLabUIPlatform` fork on the `oblivion-remastered-host` branch, with Oblivion Remastered patch notes in `vendor/NirnLabUIPlatform/OBLIVION_REMASTERED.md`.
 
 ## Runtime Contract
 
