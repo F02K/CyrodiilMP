@@ -1,6 +1,8 @@
 param(
     [ValidateSet('Debug', 'Release')]
-    [string]$Configuration = 'Release'
+    [string]$Configuration = 'Release',
+    [switch]$BuildNirnLabUIPlatformOR,
+    [string]$VcpkgRoot = $env:VCPKG_ROOT
 )
 
 $ErrorActionPreference = 'Stop'
@@ -61,4 +63,12 @@ if ((Test-Path -LiteralPath $standaloneBootstrapDll -PathType Leaf) -and (Test-P
     Write-Host "  .\scripts\install-standalone-loader.ps1 -Configuration $Configuration"
 } else {
     Write-Warning "Build finished but standalone loader outputs were not found under artifacts\native\$Configuration\Standalone"
+}
+
+if ($BuildNirnLabUIPlatformOR) {
+    Write-Host ''
+    & (Join-Path $PSScriptRoot 'build-nirnlab-uiplatformor.ps1') -Configuration $Configuration -VcpkgRoot $VcpkgRoot
+    if ($LASTEXITCODE -ne 0) {
+        throw "NirnLabUIPlatformOR build failed (exit $LASTEXITCODE)"
+    }
 }

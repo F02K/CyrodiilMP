@@ -24,6 +24,18 @@ OblivionRemastered/Binaries/Win64/CyrodiilMP/
   UI/cyrodiilmp/main-menu-button.html
 ```
 
+Build the UI runtime before installing:
+
+```powershell
+.\scripts\build-nirnlab-uiplatformor.ps1 -Configuration Release
+```
+
+Or include it with the native build:
+
+```powershell
+.\scripts\build-native.ps1 -Configuration Release -BuildNirnLabUIPlatformOR
+```
+
 Bootstrap settings:
 
 ```ini

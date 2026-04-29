@@ -18,11 +18,18 @@ This does not replace the runtime research tools yet. UE4SS can still be useful 
 .\scripts\build-native.cmd -Configuration Release
 ```
 
+Build the optional NirnLabUIPlatformOR Chromium runtime for the main-menu UI:
+
+```powershell
+.\scripts\build-native.cmd -Configuration Release -BuildNirnLabUIPlatformOR
+```
+
 This builds:
 
 - `artifacts\native\Release\GameClient\CyrodiilMP.GameClient.dll`
 - `artifacts\native\Release\Standalone\CyrodiilMP.Bootstrap.dll`
 - `artifacts\native\Release\Standalone\CyrodiilMP.Launcher.exe`
+- `artifacts\native\Release\NirnLabUIPlatformOR\NirnLabUIPlatform.dll` when `-BuildNirnLabUIPlatformOR` is used
 
 ## Install
 
@@ -42,6 +49,12 @@ OblivionRemastered\Binaries\Win64\CyrodiilMP\
   Standalone\
     CyrodiilMP.Bootstrap.dll
     CyrodiilMP.Launcher.exe
+  NirnLabUIPlatformOR\
+    NirnLabUIPlatform.dll
+  UI\
+    cyrodiilmp\
+      main-menu-button.html
+  Launch-CyrodiilMP.cmd
 ```
 
 ## Run
@@ -51,6 +64,16 @@ Launch the game through the standalone launcher:
 ```powershell
 .\scripts\run-standalone-loader.cmd -GamePath "F:\Steam\steamapps\common\Oblivion Remastered"
 ```
+
+Or use the installed game-local launcher command:
+
+```text
+F:\Steam\steamapps\common\Oblivion Remastered\OblivionRemastered\Binaries\Win64\CyrodiilMP\Launch-CyrodiilMP.cmd
+```
+
+Both paths launch/inject `CyrodiilMP.Bootstrap.dll`. Bootstrap then loads
+`CyrodiilMP.GameClient.dll`, starts the GameClient command watcher, and starts
+the NirnLabUIPlatformOR UI runtime automatically when its DLL is installed.
 
 Or inject into an already running game process:
 

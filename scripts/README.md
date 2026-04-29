@@ -231,13 +231,29 @@ Builds the standalone native GameClient DLL, test host, and the new standalone l
 .\scripts\build-native.cmd -Configuration Release
 ```
 
+To also build the Chromium UI runtime used by the NirnLabUIPlatformOR menu button:
+
+```powershell
+.\scripts\build-native.cmd -Configuration Release -BuildNirnLabUIPlatformOR
+```
+
+You can build just that UI runtime with:
+
+```powershell
+.\scripts\build-nirnlab-uiplatformor.cmd -Configuration Release
+```
+
+`NirnLabUIPlatformOR` uses vcpkg/CEF dependencies, so `VCPKG_ROOT` must point at a working vcpkg checkout.
+
 ## Install Standalone Loader
 
-Installs the native GameClient plus `CyrodiilMP.Bootstrap.dll` and `CyrodiilMP.Launcher.exe` into the game `Win64\CyrodiilMP` folder.
+Installs the native GameClient, `CyrodiilMP.Bootstrap.dll`, `CyrodiilMP.Launcher.exe`, UI assets, and the packaged `NirnLabUIPlatformOR` runtime into the game `Win64\CyrodiilMP` folder.
 
 ```powershell
 .\scripts\install-standalone-loader.cmd -GamePath "F:\Steam\steamapps\common\Oblivion Remastered"
 ```
+
+Pass `-RequireNirnLabUIPlatformOR` if the install should fail when the Chromium UI runtime has not been built yet.
 
 ## Run Standalone Loader
 
@@ -246,6 +262,14 @@ Launches Oblivion Remastered through our own injector instead of relying on UE4S
 ```powershell
 .\scripts\run-standalone-loader.cmd -GamePath "F:\Steam\steamapps\common\Oblivion Remastered"
 ```
+
+The installer also writes this game-local command:
+
+```text
+OblivionRemastered\Binaries\Win64\CyrodiilMP\Launch-CyrodiilMP.cmd
+```
+
+Starting the game through that command launches `CyrodiilMP.Launcher.exe`, injects `CyrodiilMP.Bootstrap.dll`, then Bootstrap starts GameClient and the UI runtime automatically.
 
 To inject into an already running game process:
 

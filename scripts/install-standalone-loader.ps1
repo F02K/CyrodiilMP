@@ -2,7 +2,8 @@ param(
     [string]$GamePath,
     [ValidateSet('Debug', 'Release')]
     [string]$Configuration = 'Release',
-    [switch]$SkipGameClient
+    [switch]$SkipGameClient,
+    [switch]$RequireNirnLabUIPlatformOR
 )
 
 $ErrorActionPreference = 'Stop'
@@ -19,6 +20,7 @@ $targetStandalonePath = Join-Path $targetRootPath 'Standalone'
 $targetBootstrapLogPath = Join-Path $targetRootPath 'Bootstrap'
 $targetUiPath = Join-Path $targetRootPath 'UI\cyrodiilmp'
 $targetNirnLabPath = Join-Path $targetRootPath 'NirnLabUIPlatformOR'
+$targetLaunchScriptPath = Join-Path $targetRootPath 'Launch-CyrodiilMP.cmd'
 
 $sourceGameClientPath = Join-Path $projectRoot "artifacts\native\$Configuration\GameClient"
 $sourceStandalonePath = Join-Path $projectRoot "artifacts\native\$Configuration\Standalone"
@@ -91,9 +93,27 @@ if (Test-Path -LiteralPath (Join-Path $sourceNirnLabPath 'NirnLabUIPlatform.dll'
     Write-Host "Installed NirnLabUIPlatformOR runtime -> $targetNirnLabPath"
 }
 else {
-    Write-Warning "NirnLabUIPlatformOR runtime was not found at $sourceNirnLabPath"
-    Write-Warning "The standalone loader will still run, but the Chromium main-menu button is disabled until NirnLabUIPlatform.dll is installed there."
+    $message = "NirnLabUIPlatformOR runtime was not found at $sourceNirnLabPath. Build it with .\scripts\build-nirnlab-uiplatformor.ps1 -Configuration $Configuration."
+    if ($RequireNirnLabUIPlatformOR) {
+        throw $message
+    }
+
+    Write-Warning $message
+    Write-Warning 'The standalone loader will still run, but the Chromium main-menu button is disabled until NirnLabUIPlatform.dll is installed there.'
 }
+
+@(
+    '@echo off'
+    'setlocal'
+    'set "SCRIPT_DIR=%~dp0"'
+    'set "WIN64_DIR=%SCRIPT_DIR%.."'
+    'set "GAME_EXE=%WIN64_DIR%\OblivionRemastered-Win64-Shipping.exe"'
+    'set "LAUNCHER=%SCRIPT_DIR%Standalone\CyrodiilMP.Launcher.exe"'
+    'set "BOOTSTRAP=%SCRIPT_DIR%Standalone\CyrodiilMP.Bootstrap.dll"'
+    '"%LAUNCHER%" --game-exe "%GAME_EXE%" --bootstrap-dll "%BOOTSTRAP%" %*'
+    'exit /b %ERRORLEVEL%'
+) | Set-Content -LiteralPath $targetLaunchScriptPath -Encoding ASCII
+Write-Host "Installed game launcher command -> $targetLaunchScriptPath"
 
 $statusPath = Join-Path $targetStandalonePath 'standalone-install-status.json'
 $status = [PSCustomObject]@{
@@ -105,6 +125,7 @@ $status = [PSCustomObject]@{
     GameClientPath = $targetGameClientPath
     UiPath = $targetUiPath
     NirnLabUIPlatformORPath = $targetNirnLabPath
+    LaunchCommand = $targetLaunchScriptPath
     Settings = $settingsPath
     BootstrapLog = (Join-Path $targetBootstrapLogPath 'Bootstrap.log')
 }
@@ -114,6 +135,8 @@ Write-Host ''
 Write-Host 'Standalone loader installed.'
 Write-Host 'Run it with:'
 Write-Host "  .\scripts\run-standalone-loader.ps1 -GamePath `"$resolvedGamePath`" -Configuration $Configuration"
+Write-Host 'Or from the installed game folder:'
+Write-Host "  $targetLaunchScriptPath"
 Write-Host ''
 Write-Host 'Logs:'
 Write-Host "  $($status.BootstrapLog)"
