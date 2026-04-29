@@ -67,9 +67,11 @@ if ((Test-Path -LiteralPath $standaloneBootstrapDll -PathType Leaf) -and (Test-P
 
 if ($BuildNirnLabUIPlatformOR) {
     Write-Host ''
-    $nirnLabArgs = @('-Configuration', $Configuration)
+    $nirnLabArgs = @{
+        Configuration = $Configuration
+    }
     if (-not [string]::IsNullOrWhiteSpace($VcpkgRoot)) {
-        $nirnLabArgs += @('-VcpkgRoot', $VcpkgRoot)
+        $nirnLabArgs.VcpkgRoot = $VcpkgRoot
     }
 
     & (Join-Path $PSScriptRoot 'build-nirnlab-uiplatformor.ps1') @nirnLabArgs
