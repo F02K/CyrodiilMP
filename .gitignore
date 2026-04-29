@@ -103,9 +103,9 @@ tools/**
 vendor/**
 !vendor/
 !vendor/README.md
-!vendor/NirnLabUIPlatform
-!vendor/NirnLabUIPlatform/
-!vendor/NirnLabUIPlatform/**
+!vendor/NirnLabUIPlatformOR
+!vendor/NirnLabUIPlatformOR/
+!vendor/NirnLabUIPlatformOR/**
 
 # Unreal Engine / cooked game content / mod package outputs
 Saved/

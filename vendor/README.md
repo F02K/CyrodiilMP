@@ -4,11 +4,11 @@ Third-party source checkouts live here locally and are intentionally ignored by 
 
 Current optional native UI and research experiments may use:
 
-- `vendor/NirnLabUIPlatform`
+- `vendor/NirnLabUIPlatformOR`
 - `vendor/RE-UE4SS` for historical/research-only UE4SS C++ investigation
 - `vendor/UE4SSCPPTemplate` for historical UE4SS C++ template investigation
 
-`vendor/NirnLabUIPlatform` is a Git submodule pointing at the F02K Oblivion
+`vendor/NirnLabUIPlatformOR` is a Git submodule pointing at the F02K Oblivion
 Remastered fork:
 
 ```text
@@ -27,7 +27,7 @@ the fork.
 The fork repository is named `NirnLabUIPlatformOR`, where `OR` means Oblivion
 Remastered. It is an Oblivion Remastered-only porting target; Skyrim/SKSE
 compatibility does not need to be preserved. Oblivion Remastered-specific
-changes should be documented in `vendor/NirnLabUIPlatform/OBLIVION_REMASTERED.md`.
+changes should be documented in `vendor/NirnLabUIPlatformOR/OBLIVION_REMASTERED.md`.
 
 The RE-UE4SS-based paths currently depend on the Unreal pseudo-source submodule at `deps/first/Unreal`.
 At the time of writing, the submodule URL in upstream metadata is:
