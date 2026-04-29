@@ -1,0 +1,4 @@
+[submodule "vendor/NirnLabUIPlatform"]
+	path = vendor/NirnLabUIPlatform
+	url = https://github.com/F02K/NirnLabUIPlatform.git
+	branch = oblivion-remastered-host

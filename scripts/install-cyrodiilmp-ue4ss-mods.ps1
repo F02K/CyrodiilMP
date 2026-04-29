@@ -16,10 +16,12 @@ $targetGameRoot = Join-Path $resolvedGamePath 'OblivionRemastered'
 $targetContentPath = Join-Path $targetGameRoot 'Content'
 $targetPaksPath = Join-Path $targetContentPath 'Paks'
 $sourceModsPath = Join-Path $projectRoot 'game-plugin\UE4SS\Mods'
+$sourceUiPath = Join-Path $projectRoot 'game-plugin\UI'
 $targetWin64Path = Join-Path $resolvedGamePath 'OblivionRemastered\Binaries\Win64'
 $targetModsPath = Join-Path $targetWin64Path 'Mods'
 $targetBridgePath = Join-Path $targetWin64Path 'CyrodiilMP\ClientBridge'
 $targetGameClientPath = Join-Path $targetWin64Path 'CyrodiilMP\GameClient'
+$targetUiPath = Join-Path $targetWin64Path 'CyrodiilMP\UI'
 $runtimeDumpPath = Join-Path $targetWin64Path 'CyrodiilMP_RuntimeDumps'
 $menuProbePath = Join-Path $targetWin64Path 'CyrodiilMP_MenuProbe'
 $modsListPath = Join-Path $targetModsPath 'mods.txt'
@@ -36,6 +38,7 @@ New-Item -ItemType Directory -Path $targetWin64Path -Force | Out-Null
 New-Item -ItemType Directory -Path $targetModsPath -Force | Out-Null
 New-Item -ItemType Directory -Path $targetBridgePath -Force | Out-Null
 New-Item -ItemType Directory -Path $targetGameClientPath -Force | Out-Null
+New-Item -ItemType Directory -Path $targetUiPath -Force | Out-Null
 New-Item -ItemType Directory -Path $runtimeDumpPath -Force | Out-Null
 New-Item -ItemType Directory -Path $menuProbePath -Force | Out-Null
 
@@ -69,6 +72,11 @@ foreach ($modName in $modsToInstall) {
         New-Item -ItemType File -Path $modEnabledPath -Force | Out-Null
     }
     Write-Host "Installed $modName -> $target"
+}
+
+if (Test-Path -LiteralPath $sourceUiPath -PathType Container) {
+    Copy-Item -Path (Join-Path $sourceUiPath '*') -Destination $targetUiPath -Recurse -Force
+    Write-Host "Installed CyrodiilMP UI assets -> $targetUiPath"
 }
 
 if (-not $SkipClientBridgePublish) {
@@ -172,6 +180,8 @@ Write-Host 'Menu probe dumps should appear in:'
 Write-Host $menuProbePath
 Write-Host 'Native GameClient folder:'
 Write-Host $targetGameClientPath
+Write-Host 'UI assets folder:'
+Write-Host $targetUiPath
 if ($SkipClientBridgePublish) {
     Write-Host 'Client bridge publish/install was skipped.'
     Write-Host 'Expected client bridge folder:'

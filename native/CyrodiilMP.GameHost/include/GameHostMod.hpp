@@ -8,7 +8,7 @@ namespace CyrodiilMP {
 class GameHostMod : public RC::CppUserModBase {
 public:
     GameHostMod();
-    ~GameHostMod() override = default;
+    ~GameHostMod() override;
 
     // Called once when UE4SS initialises Unreal Engine access.
     // Safe to call UObjectGlobals and register hooks here.
@@ -21,6 +21,7 @@ public:
 private:
     std::atomic<bool> m_buttonInjected{false};
     std::atomic<bool> m_hooksRegistered{false};
+    std::atomic<bool> m_uiInitialized{false};
 };
 
 } // namespace CyrodiilMP

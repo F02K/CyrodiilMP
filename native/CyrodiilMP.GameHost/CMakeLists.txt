@@ -9,6 +9,7 @@ add_library(${TARGET} SHARED
     src/HookManager.cpp
     src/BridgeLauncher.cpp
     src/ScriptingHost.cpp
+    src/UiRuntime.cpp
 )
 
 target_include_directories(${TARGET} PRIVATE include)
