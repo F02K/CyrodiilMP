@@ -8,10 +8,11 @@ Current optional native UI and research experiments may use:
 - `vendor/RE-UE4SS` for historical/research-only UE4SS C++ investigation
 - `vendor/UE4SSCPPTemplate` for historical UE4SS C++ template investigation
 
-`vendor/NirnLabUIPlatform` is a Git submodule pointing at the F02K fork:
+`vendor/NirnLabUIPlatform` is a Git submodule pointing at the F02K Oblivion
+Remastered fork:
 
 ```text
-https://github.com/F02K/NirnLabUIPlatform
+https://github.com/F02K/NirnLabUIPlatformOR
 ```
 
 The submodule currently tracks the `oblivion-remastered-host` branch. That fork
@@ -23,7 +24,8 @@ https://github.com/kkEngine/NirnLabUIPlatform
 
 Upstream license: MIT. Keep the upstream `LICENSE` file and credit intact in
 the fork.
-The fork is now an Oblivion Remastered-only porting target; Skyrim/SKSE
+The fork repository is named `NirnLabUIPlatformOR`, where `OR` means Oblivion
+Remastered. It is an Oblivion Remastered-only porting target; Skyrim/SKSE
 compatibility does not need to be preserved. Oblivion Remastered-specific
 changes should be documented in `vendor/NirnLabUIPlatform/OBLIVION_REMASTERED.md`.
 

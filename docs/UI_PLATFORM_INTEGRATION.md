@@ -9,7 +9,7 @@ The NirnLabUIPlatform source is referenced as a submodule under `vendor/NirnLabU
 - UI runtime work should move into the owned launcher/bootstrap native path.
 - UE4SS may still be used for dumps and runtime inspection, but not for game UI ownership.
 - Static web assets live in `game-plugin/UI/cyrodiilmp`.
-- NirnLabUIPlatform points at the `F02K/NirnLabUIPlatform` fork on the `oblivion-remastered-host` branch. That fork is now allowed to become Oblivion Remastered-only; Skyrim/SKSE compatibility is not a target.
+- NirnLabUIPlatform points at the `F02K/NirnLabUIPlatformOR` fork on the `oblivion-remastered-host` branch. `OR` means Oblivion Remastered; Skyrim/SKSE compatibility is not a target for this fork.
 
 ## Runtime Contract
 
