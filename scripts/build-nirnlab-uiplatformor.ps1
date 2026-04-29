@@ -32,6 +32,9 @@ if (-not (Test-Path -LiteralPath (Join-Path $VcpkgRoot 'scripts\buildsystems\vcp
     throw "Vcpkg toolchain was not found under $VcpkgRoot. Run git submodule update --init --recursive vendor/vcpkg, or pass -VcpkgRoot."
 }
 
+$VcpkgRoot = (Resolve-Path -LiteralPath $VcpkgRoot).Path
+$env:VCPKG_ROOT = $VcpkgRoot
+
 $vcpkgExe = Join-Path $VcpkgRoot 'vcpkg.exe'
 if ((-not $SkipVcpkgBootstrap) -and (-not (Test-Path -LiteralPath $vcpkgExe -PathType Leaf))) {
     $bootstrap = Join-Path $VcpkgRoot 'bootstrap-vcpkg.bat'
