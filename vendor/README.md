@@ -5,6 +5,7 @@ Third-party source checkouts live here locally and are intentionally ignored by 
 Current optional native UI and research experiments may use:
 
 - `vendor/NirnLabUIPlatformOR`
+- `vendor/vcpkg` for the F02K vcpkg fork used to build/package NirnLabUIPlatformOR
 - `vendor/RE-UE4SS` for historical/research-only UE4SS C++ investigation
 - `vendor/UE4SSCPPTemplate` for historical UE4SS C++ template investigation
 
@@ -28,6 +29,15 @@ The fork repository is named `NirnLabUIPlatformOR`, where `OR` means Oblivion
 Remastered. It is an Oblivion Remastered-only porting target; Skyrim/SKSE
 compatibility does not need to be preserved. Oblivion Remastered-specific
 changes should be documented in `vendor/NirnLabUIPlatformOR/OBLIVION_REMASTERED.md`.
+
+`vendor/vcpkg` is a Git submodule pointing at:
+
+```text
+https://github.com/F02K/vcpkg
+```
+
+The NirnLabUIPlatformOR build script uses this vendored checkout by default and
+bootstraps `vcpkg.exe` automatically when needed.
 
 The RE-UE4SS-based paths currently depend on the Unreal pseudo-source submodule at `deps/first/Unreal`.
 At the time of writing, the submodule URL in upstream metadata is:

@@ -30,6 +30,9 @@ Build the UI runtime before installing:
 .\scripts\build-nirnlab-uiplatformor.ps1 -Configuration Release
 ```
 
+The script uses `vendor/vcpkg` by default and bootstraps it automatically when
+`vcpkg.exe` is missing.
+
 Or include it with the native build:
 
 ```powershell

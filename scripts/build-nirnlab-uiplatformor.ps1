@@ -1,13 +1,15 @@
 param(
     [ValidateSet('Debug', 'Release')]
     [string]$Configuration = 'Release',
-    [string]$VcpkgRoot = $env:VCPKG_ROOT,
-    [switch]$Clean
+    [string]$VcpkgRoot,
+    [switch]$Clean,
+    [switch]$SkipVcpkgBootstrap
 )
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = Resolve-Path (Join-Path $PSScriptRoot '..')
 $sourceRoot = Join-Path $projectRoot 'vendor\NirnLabUIPlatformOR'
+$vendoredVcpkgRoot = Join-Path $projectRoot 'vendor\vcpkg'
 $preset = $Configuration.ToLower()
 $buildRoot = Join-Path $projectRoot "artifacts\build\nirnlab-uiplatformor\$preset"
 $outputRoot = Join-Path $projectRoot "artifacts\native\$Configuration"
@@ -18,11 +20,34 @@ if (-not (Test-Path -LiteralPath (Join-Path $sourceRoot 'CMakeLists.txt') -PathT
 }
 
 if ([string]::IsNullOrWhiteSpace($VcpkgRoot)) {
-    throw 'VCPKG_ROOT is not set. Pass -VcpkgRoot or set the VCPKG_ROOT environment variable before building NirnLabUIPlatformOR.'
+    if (-not [string]::IsNullOrWhiteSpace($env:VCPKG_ROOT)) {
+        $VcpkgRoot = $env:VCPKG_ROOT
+    }
+    else {
+        $VcpkgRoot = $vendoredVcpkgRoot
+    }
 }
 
 if (-not (Test-Path -LiteralPath (Join-Path $VcpkgRoot 'scripts\buildsystems\vcpkg.cmake') -PathType Leaf)) {
-    throw "Vcpkg toolchain was not found under $VcpkgRoot"
+    throw "Vcpkg toolchain was not found under $VcpkgRoot. Run git submodule update --init --recursive vendor/vcpkg, or pass -VcpkgRoot."
+}
+
+$vcpkgExe = Join-Path $VcpkgRoot 'vcpkg.exe'
+if ((-not $SkipVcpkgBootstrap) -and (-not (Test-Path -LiteralPath $vcpkgExe -PathType Leaf))) {
+    $bootstrap = Join-Path $VcpkgRoot 'bootstrap-vcpkg.bat'
+    if (-not (Test-Path -LiteralPath $bootstrap -PathType Leaf)) {
+        throw "vcpkg bootstrap script was not found at $bootstrap"
+    }
+
+    Write-Host "Bootstrapping vendored vcpkg..."
+    & $bootstrap
+    if ($LASTEXITCODE -ne 0) {
+        throw "vcpkg bootstrap failed (exit $LASTEXITCODE)"
+    }
+}
+
+if (-not (Test-Path -LiteralPath $vcpkgExe -PathType Leaf)) {
+    throw "vcpkg.exe was not found under $VcpkgRoot. Run $VcpkgRoot\bootstrap-vcpkg.bat or omit -SkipVcpkgBootstrap."
 }
 
 if ($Clean -and (Test-Path -LiteralPath $buildRoot -PathType Container)) {
@@ -40,6 +65,7 @@ New-Item -ItemType Directory -Path $packageRoot -Force | Out-Null
 
 Write-Host "Building NirnLabUIPlatformOR ($Configuration)..."
 Write-Host "Source:  $sourceRoot"
+Write-Host "vcpkg:   $VcpkgRoot"
 Write-Host "Build:   $buildRoot"
 Write-Host "Package: $packageRoot"
 Write-Host ''

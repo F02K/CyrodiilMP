@@ -24,6 +24,13 @@ Build the optional NirnLabUIPlatformOR Chromium runtime for the main-menu UI:
 .\scripts\build-native.cmd -Configuration Release -BuildNirnLabUIPlatformOR
 ```
 
+This uses the vendored `vendor/vcpkg` submodule by default. Run submodule
+initialization first on a fresh checkout:
+
+```powershell
+git submodule update --init --recursive
+```
+
 This builds:
 
 - `artifacts\native\Release\GameClient\CyrodiilMP.GameClient.dll`

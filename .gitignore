@@ -106,6 +106,9 @@ vendor/**
 !vendor/NirnLabUIPlatformOR
 !vendor/NirnLabUIPlatformOR/
 !vendor/NirnLabUIPlatformOR/**
+!vendor/vcpkg
+!vendor/vcpkg/
+!vendor/vcpkg/**
 
 # Unreal Engine / cooked game content / mod package outputs
 Saved/

@@ -243,7 +243,7 @@ You can build just that UI runtime with:
 .\scripts\build-nirnlab-uiplatformor.cmd -Configuration Release
 ```
 
-`NirnLabUIPlatformOR` uses vcpkg/CEF dependencies, so `VCPKG_ROOT` must point at a working vcpkg checkout.
+`NirnLabUIPlatformOR` uses the vendored `vendor/vcpkg` submodule by default and bootstraps `vcpkg.exe` automatically when needed. Pass `-VcpkgRoot` only if you want to use a different checkout.
 
 ## Install Standalone Loader
 

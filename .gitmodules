@@ -2,3 +2,6 @@
 	path = vendor/NirnLabUIPlatformOR
 	url = https://github.com/F02K/NirnLabUIPlatformOR.git
 	branch = oblivion-remastered-host
+[submodule "vendor/vcpkg"]
+	path = vendor/vcpkg
+	url = https://github.com/F02K/vcpkg.git
