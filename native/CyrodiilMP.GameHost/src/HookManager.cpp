@@ -1,5 +1,6 @@
 #include "HookManager.hpp"
 #include "BridgeLauncher.hpp"
+#include "UiRuntime.hpp"
 
 #include <DynamicOutput/DynamicOutput.hpp>
 #include <Unreal/UObjectGlobals.hpp>
@@ -43,8 +44,14 @@ void RegisterHooks()
             if (IsMultiplayerClick(context, function))
             {
                 RC::Output::send<RC::LogLevel::Normal>(
-                    STR("[CyrodiilMP.GameHost] MULTIPLAYER button clicked — launching bridge\n"));
-                BridgeLauncher::LaunchAsync();
+                    STR("[CyrodiilMP.GameHost] MULTIPLAYER button clicked\n"));
+                const auto ui_opened = UiRuntime::ShowView(UiRuntime::MainMenuViewId());
+                if (!ui_opened || !UiRuntime::HasInteractiveBackend())
+                {
+                    RC::Output::send<RC::LogLevel::Normal>(
+                        STR("[CyrodiilMP.GameHost] UI backend unavailable; launching bridge fallback\n"));
+                    BridgeLauncher::LaunchAsync();
+                }
             }
         });
 }

@@ -6,8 +6,20 @@ Current optional native UI experiments may use:
 
 - `vendor/RE-UE4SS`
 - `vendor/UE4SSCPPTemplate`
+- `vendor/NirnLabUIPlatform`
 
-Both currently depend on the RE-UE4SS Unreal pseudo-source submodule at `deps/first/Unreal`.
+`vendor/NirnLabUIPlatform` is intentionally tracked as a CyrodiilMP source fork,
+not as a local-only checkout. It starts from:
+
+```text
+https://github.com/kkEngine/NirnLabUIPlatform
+```
+
+Upstream license: MIT. Keep the upstream `LICENSE` file and credit intact.
+Oblivion Remastered-specific changes should be documented in
+`vendor/NirnLabUIPlatform/OBLIVION_REMASTERED.md`.
+
+The RE-UE4SS-based paths currently depend on the Unreal pseudo-source submodule at `deps/first/Unreal`.
 At the time of writing, the submodule URL in upstream metadata is:
 
 ```text

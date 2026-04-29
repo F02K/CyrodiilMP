@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CyrodiilMP</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="shell">
+        <section class="panel" aria-labelledby="title">
+            <header class="panel-header">
+                <div>
+                    <p class="kicker">Oblivion Remastered</p>
+                    <h1 id="title">CyrodiilMP</h1>
+                </div>
+                <button class="icon-button" id="closeButton" type="button" aria-label="Close">X</button>
+            </header>
+
+            <form id="connectForm" class="form">
+                <label>
+                    <span>Server</span>
+                    <input id="hostInput" name="host" autocomplete="off" value="127.0.0.1">
+                </label>
+
+                <label>
+                    <span>Port</span>
+                    <input id="portInput" name="port" inputmode="numeric" value="27016">
+                </label>
+
+                <label>
+                    <span>Name</span>
+                    <input id="nameInput" name="name" autocomplete="off" value="OblivionPlayer">
+                </label>
+
+                <div class="actions">
+                    <button class="primary" type="submit">Connect</button>
+                    <button class="secondary" id="disconnectButton" type="button">Disconnect</button>
+                </div>
+            </form>
+
+            <output id="statusOutput" class="status">Ready</output>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>

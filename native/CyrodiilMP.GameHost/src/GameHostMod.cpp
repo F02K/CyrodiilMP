@@ -2,6 +2,7 @@
 #include "ButtonInjector.hpp"
 #include "BridgeLauncher.hpp"
 #include "HookManager.hpp"
+#include "UiRuntime.hpp"
 
 #include <DynamicOutput/DynamicOutput.hpp>
 
@@ -15,9 +16,34 @@ GameHostMod::GameHostMod()
     ModAuthors     = STR("CyrodiilMP");
 }
 
+GameHostMod::~GameHostMod()
+{
+    if (m_uiInitialized.load(std::memory_order_relaxed))
+    {
+        UiRuntime::Shutdown();
+    }
+}
+
 auto GameHostMod::on_unreal_init() -> void
 {
     RC::Output::send<RC::LogLevel::Normal>(STR("[CyrodiilMP.GameHost] on_unreal_init\n"));
+
+    UiRuntime::Initialize({
+        .asset_root = "CyrodiilMP\\UI",
+        .preferred_backend = "nirnlab"
+    });
+    UiRuntime::CreateView(UiRuntime::MainMenuViewId(), "cyrodiilmp\\index.html");
+    UiRuntime::RegisterCommand("cyrodiilmp.connect", [](std::string_view) {
+        BridgeLauncher::LaunchAsync();
+    });
+    UiRuntime::RegisterCommand("cyrodiilmp.disconnect", [](std::string_view) {
+        RC::Output::send<RC::LogLevel::Normal>(
+            STR("[CyrodiilMP.GameHost] UI disconnect requested; GameClient direct ABI wiring is pending\n"));
+    });
+    UiRuntime::RegisterCommand("cyrodiilmp.close", [](std::string_view) {
+        UiRuntime::HideView(UiRuntime::MainMenuViewId());
+    });
+    m_uiInitialized.store(true, std::memory_order_relaxed);
 
     HookManager::RegisterHooks();
     m_hooksRegistered = true;
@@ -42,6 +68,7 @@ auto GameHostMod::on_update() -> void
     // Drain results posted by the bridge launcher background thread and fire
     // any pending scripting events (e.g. connect.succeeded → open level).
     BridgeLauncher::DrainResultQueue();
+    UiRuntime::Tick();
 }
 
 } // namespace CyrodiilMP
