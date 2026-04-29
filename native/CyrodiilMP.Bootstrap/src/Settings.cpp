@@ -63,8 +63,14 @@ void EnsureSettingsFile(const std::filesystem::path& settings_path)
     output
         << "# CyrodiilMP standalone bootstrap settings\n"
         << "# Set EnableUEPatternScan=false if a game update makes startup scanning unstable.\n"
+        << "# Set EnableNirnLabUI=false to disable the Chromium UI backend.\n"
+        << "# Set ShowMainMenuButton=false to keep the backend available but hide the prototype menu button.\n"
         << "[UEBridge]\n"
-        << "EnableUEPatternScan=true\n";
+        << "EnableUEPatternScan=true\n"
+        << "\n"
+        << "[UI]\n"
+        << "EnableNirnLabUI=true\n"
+        << "ShowMainMenuButton=true\n";
 }
 
 BootstrapSettings LoadSettings(const std::filesystem::path& settings_path)
@@ -111,6 +117,14 @@ BootstrapSettings LoadSettings(const std::filesystem::path& settings_path)
         if (section == "uebridge" && key == "enableuepatternscan")
         {
             settings.enable_ue_pattern_scan = ParseBool(value, settings.enable_ue_pattern_scan);
+        }
+        else if (section == "ui" && key == "enablenirnlabui")
+        {
+            settings.enable_nirnlab_ui = ParseBool(value, settings.enable_nirnlab_ui);
+        }
+        else if (section == "ui" && key == "showmainmenubutton")
+        {
+            settings.show_main_menu_button = ParseBool(value, settings.show_main_menu_button);
         }
     }
 

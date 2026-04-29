@@ -10,6 +10,33 @@ The NirnLabUIPlatformOR source is referenced as a submodule under `vendor/NirnLa
 - UE4SS may still be used for dumps and runtime inspection, but not for game UI ownership.
 - Static web assets live in `game-plugin/UI/cyrodiilmp`.
 - NirnLabUIPlatformOR points at the `F02K/NirnLabUIPlatformOR` fork on the `oblivion-remastered-host` branch. `OR` means Oblivion Remastered; Skyrim/SKSE compatibility is not a target for this fork.
+- `CyrodiilMP.Bootstrap` now has a `UiRuntime` loader that looks for `CyrodiilMP/NirnLabUIPlatformOR/NirnLabUIPlatform.dll`, creates a Chromium-backed `MULTIPLAYER` button view, and routes button JavaScript commands back to the existing native GameClient command watcher.
+
+## Main Menu Button Slice
+
+Installed layout:
+
+```text
+OblivionRemastered/Binaries/Win64/CyrodiilMP/
+  Bootstrap/settings.ini
+  GameClient/
+  NirnLabUIPlatformOR/NirnLabUIPlatform.dll
+  UI/cyrodiilmp/main-menu-button.html
+```
+
+Bootstrap settings:
+
+```ini
+[UI]
+EnableNirnLabUI=true
+ShowMainMenuButton=true
+```
+
+The current button view is a first host integration slice. It proves that
+Bootstrap can load NirnLabUIPlatformOR, create a browser, bind
+`CyrodiilMP.invoke`, and write `connect-request.txt` for GameClient. The exact
+UE main-menu widget anchoring still needs to be attached once the Oblivion
+Remastered menu widget/function names are confirmed from runtime dumps.
 
 ## Runtime Contract
 

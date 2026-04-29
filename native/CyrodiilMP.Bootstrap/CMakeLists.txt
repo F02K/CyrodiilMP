@@ -7,11 +7,16 @@ add_library(${TARGET} SHARED
     src/Log.cpp
     src/PatternScanner.cpp
     src/Settings.cpp
+    src/UiRuntime.cpp
     src/UEBridge.cpp
     src/UEPatterns.cpp
 )
 
-target_include_directories(${TARGET} PRIVATE src)
+target_include_directories(${TARGET}
+    PRIVATE
+        src
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/NirnLabUIPlatformOR/src/UIPlatform"
+)
 
 set(BOOTSTRAP_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../artifacts/native/$<CONFIG>/Standalone")
 

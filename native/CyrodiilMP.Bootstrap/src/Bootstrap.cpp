@@ -2,6 +2,7 @@
 
 #include "Log.hpp"
 #include "Settings.hpp"
+#include "UiRuntime.hpp"
 #include "UEBridge.hpp"
 
 #include <cstdint>
@@ -45,6 +46,7 @@ DWORD WINAPI WorkerThread(LPVOID)
     const auto root_dir = win64_dir / "CyrodiilMP";
     const auto bootstrap_dir = root_dir / "Bootstrap";
     const auto game_client_dir = root_dir / "GameClient";
+    const auto ui_dir = root_dir / "UI" / "cyrodiilmp";
     const auto bootstrap_log = bootstrap_dir / "Bootstrap.log";
     const auto game_client_log = game_client_dir / "GameClient.log";
     const auto game_client_dll = game_client_dir / "CyrodiilMP.GameClient.dll";
@@ -88,6 +90,21 @@ DWORD WINAPI WorkerThread(LPVOID)
     start_watcher(game_client_dir_text.c_str(), "127.0.0.1", 27016);
 
     Log::Write("GameClient initialized from standalone bootstrap");
+
+    if (settings.enable_nirnlab_ui)
+    {
+        UiRuntime::Instance().Initialize(UiRuntimeSettings{
+            root_dir,
+            game_client_dir,
+            ui_dir,
+            settings.show_main_menu_button
+        });
+    }
+    else
+    {
+        Log::Write("UiRuntime disabled by settings");
+    }
+
     return 0;
 }
 
@@ -101,6 +118,8 @@ void Start(HMODULE self_module)
 
 void Stop()
 {
+    UiRuntime::Instance().Shutdown();
+
     if (g_game_client_module != nullptr)
     {
         auto* stop_watcher = reinterpret_cast<StopWatcherFn>(GetProcAddress(g_game_client_module, "CyrodiilMP_StopMenuCommandWatcher"));
