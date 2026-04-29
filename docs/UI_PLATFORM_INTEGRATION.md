@@ -5,7 +5,7 @@ The NirnLabUIPlatform source is referenced as a submodule under `vendor/NirnLabU
 
 ## Current Slice
 
-- The previous UE4SS `CyrodiilMP.GameHost` UI path is retired.
+- The previous UE4SS UI path was deleted with the retired C++ experiment.
 - UI runtime work should move into the owned launcher/bootstrap native path.
 - UE4SS may still be used for dumps and runtime inspection, but not for game UI ownership.
 - Static web assets live in `game-plugin/UI/cyrodiilmp`.

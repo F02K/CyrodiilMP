@@ -40,7 +40,7 @@ Use the helper scripts to collect initial UE5/game-folder data without modifying
 .\scripts\install-cyrodiilmp-ue4ss-mods.cmd
 ```
 
-UE4SS helpers are research/dumper tooling only. See `scripts/README.md` for the full helper list, `docs/PROJECT_STRUCTURE.md` for runtime ownership boundaries, `docs/REPOSITORY_ORGANIZATION.md` for the repo cleanup map, `docs/STANDALONE_LOADER.md` for the owned native loader path, `docs/NATIVE_GAMECLIENT.md` for the standalone native GameClient, `docs/UE4SS_RESEARCH.md` for UE4SS scope, and `docs/NATIVE_GAMEHOST.md` for the retired UE4SS C++ mod path.
+UE4SS helpers are research/dumper tooling only. See `scripts/README.md` for the full helper list, `docs/PROJECT_STRUCTURE.md` for runtime ownership boundaries, `docs/REPOSITORY_ORGANIZATION.md` for the repo cleanup map, `docs/STANDALONE_LOADER.md` for the owned native loader path, `docs/NATIVE_GAMECLIENT.md` for the standalone native GameClient, and `docs/UE4SS_RESEARCH.md` for UE4SS scope.
 
 ## License And Rights
 

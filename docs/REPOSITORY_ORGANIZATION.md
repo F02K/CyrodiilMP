@@ -47,7 +47,6 @@ Keep useful written notes. Generated CSV/JSON/log dumps should stay ignored unle
 
 ## Experimental Or Legacy Areas
 
-- `native/CyrodiilMP.GameHost/` is a retired UE4SS C++ UI experiment. Do not add new runtime work there.
 - `game-plugin/UE4SS/Mods/CyrodiilMP_ConnectButtonPrototype/` and `CyrodiilMP_GameClientBootstrap/` are retired Lua runtime prototypes.
 - `client/CyrodiilMP.ClientBridge/` is useful only for historical smoke tests; the runtime path is native `GameClient` plus standalone bootstrap.
 
