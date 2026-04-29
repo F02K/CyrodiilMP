@@ -37,7 +37,7 @@ This builds:
 - `artifacts\native\Release\Standalone\CyrodiilMP.Bootstrap.dll`
 - `artifacts\native\Release\Standalone\CyrodiilMP.Launcher.exe`
 - `artifacts\native\Release\AutoLoader\version.dll`
-- `artifacts\native\Release\NirnLabUIPlatformOR\NirnLabUIPlatform.dll` when `-BuildNirnLabUIPlatformOR` is used
+- `artifacts\native\Release\NirnLabUIPlatformOR\NirnLabUIPlatformOR.dll` when `-BuildNirnLabUIPlatformOR` is used
 
 ## Install
 
@@ -58,7 +58,7 @@ OblivionRemastered\Binaries\Win64\CyrodiilMP\
     CyrodiilMP.Bootstrap.dll
     CyrodiilMP.Launcher.exe
   NirnLabUIPlatformOR\
-    NirnLabUIPlatform.dll
+    NirnLabUIPlatformOR.dll
   UI\
     cyrodiilmp\
       main-menu-button.html

@@ -66,6 +66,11 @@ if ($Clean -and (Test-Path -LiteralPath $buildRoot -PathType Container)) {
 New-Item -ItemType Directory -Path $buildRoot -Force | Out-Null
 New-Item -ItemType Directory -Path $packageRoot -Force | Out-Null
 
+$legacyDllPath = Join-Path $packageRoot 'NirnLabUIPlatform.dll'
+if (Test-Path -LiteralPath $legacyDllPath -PathType Leaf) {
+    Remove-Item -LiteralPath $legacyDllPath -Force
+}
+
 Write-Host "Building NirnLabUIPlatformOR ($Configuration)..."
 Write-Host "Source:  $sourceRoot"
 Write-Host "vcpkg:   $VcpkgRoot"
@@ -90,7 +95,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "NirnLabUIPlatformOR build failed (exit $LASTEXITCODE)"
 }
 
-$dllPath = Join-Path $packageRoot 'NirnLabUIPlatform.dll'
+$dllPath = Join-Path $packageRoot 'NirnLabUIPlatformOR.dll'
 if (-not (Test-Path -LiteralPath $dllPath -PathType Leaf)) {
     throw "NirnLabUIPlatformOR build finished but $dllPath was not produced."
 }

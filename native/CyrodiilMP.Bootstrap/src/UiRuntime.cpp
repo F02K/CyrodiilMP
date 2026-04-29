@@ -221,9 +221,7 @@ void InvokeCallback(const char** args, int arg_count)
 std::filesystem::path FindUiPlatformDll(const std::filesystem::path& root_directory)
 {
     const std::filesystem::path candidates[] = {
-        root_directory / "NirnLabUIPlatformOR" / "NirnLabUIPlatform.dll",
         root_directory / "NirnLabUIPlatformOR" / "NirnLabUIPlatformOR.dll",
-        root_directory / "Standalone" / "NirnLabUIPlatform.dll",
         root_directory / "Standalone" / "NirnLabUIPlatformOR.dll"
     };
 

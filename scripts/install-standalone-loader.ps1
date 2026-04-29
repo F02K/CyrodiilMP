@@ -111,7 +111,12 @@ if (Test-Path -LiteralPath $sourceUiPath -PathType Container) {
     Write-Host "Installed CyrodiilMP UI assets -> $targetUiPath"
 }
 
-if (Test-Path -LiteralPath (Join-Path $sourceNirnLabPath 'NirnLabUIPlatform.dll') -PathType Leaf) {
+if (Test-Path -LiteralPath (Join-Path $sourceNirnLabPath 'NirnLabUIPlatformOR.dll') -PathType Leaf) {
+    $legacyTargetNirnLabDll = Join-Path $targetNirnLabPath 'NirnLabUIPlatform.dll'
+    if (Test-Path -LiteralPath $legacyTargetNirnLabDll -PathType Leaf) {
+        Remove-Item -LiteralPath $legacyTargetNirnLabDll -Force
+    }
+
     Copy-Item -Path (Join-Path $sourceNirnLabPath '*') -Destination $targetNirnLabPath -Recurse -Force
     Write-Host "Installed NirnLabUIPlatformOR runtime -> $targetNirnLabPath"
 }
@@ -122,7 +127,7 @@ else {
     }
 
     Write-Warning $message
-    Write-Warning 'The standalone loader will still run, but the Chromium main-menu button is disabled until NirnLabUIPlatform.dll is installed there.'
+    Write-Warning 'The standalone loader will still run, but the Chromium main-menu button is disabled until NirnLabUIPlatformOR.dll is installed there.'
 }
 
 @(
