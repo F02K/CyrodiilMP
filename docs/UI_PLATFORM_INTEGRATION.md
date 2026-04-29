@@ -1,7 +1,7 @@
 # UI Platform Integration
 
 CyrodiilMP owns a small UI API boundary for the standalone launcher/bootstrap path.
-The NirnLabUIPlatform source is referenced as a submodule under `vendor/NirnLabUIPlatform` and should plug in behind that boundary instead of becoming a direct dependency of gameplay or networking code.
+The NirnLabUIPlatformOR source is referenced as a submodule under `vendor/NirnLabUIPlatformOR` and should plug in behind that boundary instead of becoming a direct dependency of gameplay or networking code.
 
 ## Current Slice
 
@@ -9,7 +9,7 @@ The NirnLabUIPlatform source is referenced as a submodule under `vendor/NirnLabU
 - UI runtime work should move into the owned launcher/bootstrap native path.
 - UE4SS may still be used for dumps and runtime inspection, but not for game UI ownership.
 - Static web assets live in `game-plugin/UI/cyrodiilmp`.
-- NirnLabUIPlatform points at the `F02K/NirnLabUIPlatformOR` fork on the `oblivion-remastered-host` branch. `OR` means Oblivion Remastered; Skyrim/SKSE compatibility is not a target for this fork.
+- NirnLabUIPlatformOR points at the `F02K/NirnLabUIPlatformOR` fork on the `oblivion-remastered-host` branch. `OR` means Oblivion Remastered; Skyrim/SKSE compatibility is not a target for this fork.
 
 ## Runtime Contract
 
