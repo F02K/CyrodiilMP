@@ -60,6 +60,10 @@ Bootstrap can load NirnLabUIPlatformOR, create a browser, bind
 UE main-menu widget anchoring still needs to be attached once the Oblivion
 Remastered menu widget/function names are confirmed from runtime dumps.
 
+The normal Steam launch path is handled by the installed AutoLoader proxy
+`Win64\version.dll`, which loads Bootstrap before Bootstrap initializes
+GameClient and the UI runtime.
+
 ## Runtime Contract
 
 The native side exposes these operations:

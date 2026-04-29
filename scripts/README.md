@@ -225,7 +225,7 @@ Builds the shared protocol library, server, client bridge, probe, and dashboard.
 
 ## Build Native GameClient
 
-Builds the standalone native GameClient DLL, test host, and the new standalone loader/bootstrap. This does not require RE-UE4SS.
+Builds the standalone native GameClient DLL, test host, standalone loader/bootstrap, launcher, and AutoLoader proxy DLL. This does not require RE-UE4SS.
 
 ```powershell
 .\scripts\build-native.cmd -Configuration Release
@@ -247,17 +247,18 @@ You can build just that UI runtime with:
 
 ## Install Standalone Loader
 
-Installs the native GameClient, `CyrodiilMP.Bootstrap.dll`, `CyrodiilMP.Launcher.exe`, UI assets, and the packaged `NirnLabUIPlatformOR` runtime into the game `Win64\CyrodiilMP` folder.
+Installs the native GameClient, `CyrodiilMP.Bootstrap.dll`, `CyrodiilMP.Launcher.exe`, UI assets, the `version.dll` AutoLoader proxy, and the packaged `NirnLabUIPlatformOR` runtime into the game `Win64` folder.
 
 ```powershell
 .\scripts\install-standalone-loader.cmd -GamePath "F:\Steam\steamapps\common\Oblivion Remastered"
 ```
 
 Pass `-RequireNirnLabUIPlatformOR` if the install should fail when the Chromium UI runtime has not been built yet.
+Pass `-SkipAutoLoader` if you only want manual/debug injection and do not want to install the `version.dll` proxy.
 
 ## Run Standalone Loader
 
-Launches Oblivion Remastered through our own injector instead of relying on UE4SS to load the client.
+Launches Oblivion Remastered through our own injector instead of relying on UE4SS to load the client. This is mainly a manual/debug fallback; after installing the AutoLoader proxy, normal Steam launch loads CyrodiilMP automatically.
 
 ```powershell
 .\scripts\run-standalone-loader.cmd -GamePath "F:\Steam\steamapps\common\Oblivion Remastered"

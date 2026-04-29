@@ -36,6 +36,7 @@ This builds:
 - `artifacts\native\Release\GameClient\CyrodiilMP.GameClient.dll`
 - `artifacts\native\Release\Standalone\CyrodiilMP.Bootstrap.dll`
 - `artifacts\native\Release\Standalone\CyrodiilMP.Launcher.exe`
+- `artifacts\native\Release\AutoLoader\version.dll`
 - `artifacts\native\Release\NirnLabUIPlatformOR\NirnLabUIPlatform.dll` when `-BuildNirnLabUIPlatformOR` is used
 
 ## Install
@@ -62,9 +63,18 @@ OblivionRemastered\Binaries\Win64\CyrodiilMP\
     cyrodiilmp\
       main-menu-button.html
   Launch-CyrodiilMP.cmd
+version.dll
 ```
 
+`version.dll` is the AutoLoader proxy. It forwards Version API calls to the real
+Windows `version.dll`, then loads `CyrodiilMP\Standalone\CyrodiilMP.Bootstrap.dll`.
+If a `version.dll` already exists beside the game executable, the installer
+copies it to `version.dll.pre-cyrodiilmp.bak` before installing the proxy.
+
 ## Run
+
+After install, normal Steam launch should load CyrodiilMP automatically through
+the AutoLoader proxy.
 
 Launch the game through the standalone launcher:
 

@@ -46,6 +46,7 @@ $gameClientDll = Join-Path $projectRoot "artifacts\native\$Configuration\GameCli
 $gameClientHost = Join-Path $projectRoot "artifacts\native\$Configuration\GameClient\CyrodiilMP.GameClient.Host.exe"
 $standaloneBootstrapDll = Join-Path $projectRoot "artifacts\native\$Configuration\Standalone\CyrodiilMP.Bootstrap.dll"
 $standaloneLauncherExe = Join-Path $projectRoot "artifacts\native\$Configuration\Standalone\CyrodiilMP.Launcher.exe"
+$autoLoaderDll = Join-Path $projectRoot "artifacts\native\$Configuration\AutoLoader\version.dll"
 
 if (Test-Path -LiteralPath $gameClientDll -PathType Leaf) {
     Write-Host ''
@@ -63,6 +64,13 @@ if ((Test-Path -LiteralPath $standaloneBootstrapDll -PathType Leaf) -and (Test-P
     Write-Host "  .\scripts\install-standalone-loader.ps1 -Configuration $Configuration"
 } else {
     Write-Warning "Build finished but standalone loader outputs were not found under artifacts\native\$Configuration\Standalone"
+}
+
+if (Test-Path -LiteralPath $autoLoaderDll -PathType Leaf) {
+    Write-Host ''
+    Write-Host "AutoLoader proxy build succeeded: $autoLoaderDll"
+} else {
+    Write-Warning "Build finished but AutoLoader proxy was not found at $autoLoaderDll"
 }
 
 if ($BuildNirnLabUIPlatformOR) {
