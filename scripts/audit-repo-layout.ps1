@@ -6,22 +6,18 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = Resolve-Path (Join-Path $PSScriptRoot '..')
 
 $folders = @(
+    [PSCustomObject]@{ Path = 'RE-UE4SS'; Category = 'active-source/submodule'; Note = 'F02K UE4SS fork used as the runtime base.' },
+    [PSCustomObject]@{ Path = 'game-plugin'; Category = 'active-source/lua'; Note = 'UE4SS Lua mods installed into the game Mods folder.' },
     [PSCustomObject]@{ Path = 'server'; Category = 'active-source'; Note = 'Dedicated server prototype.' },
     [PSCustomObject]@{ Path = 'shared'; Category = 'active-source'; Note = 'Shared protocol contracts.' },
-    [PSCustomObject]@{ Path = 'native'; Category = 'active-source'; Note = 'Standalone runtime, launcher, native GameClient, and future owned UI work.' },
-    [PSCustomObject]@{ Path = 'client'; Category = 'active-source/transitional'; Note = 'Managed bridge for early smoke tests.' },
     [PSCustomObject]@{ Path = 'dashboard'; Category = 'active-source/tooling'; Note = 'Local research dashboard.' },
-    [PSCustomObject]@{ Path = 'game-plugin'; Category = 'active-source/research'; Note = 'UE4SS Lua research and dumper helpers.' },
     [PSCustomObject]@{ Path = 'scripts'; Category = 'active-source/tooling'; Note = 'Reusable developer commands.' },
     [PSCustomObject]@{ Path = 'build'; Category = 'active-source/tooling'; Note = 'Build/publish helper scripts. Not generated output.' },
     [PSCustomObject]@{ Path = 'docs'; Category = 'active-source/docs'; Note = 'Project documentation.' },
-    [PSCustomObject]@{ Path = 'tests'; Category = 'active-source/probes'; Note = 'Probe/test executables.' },
     [PSCustomObject]@{ Path = 'research'; Category = 'research-workspace'; Note = 'Notes and generated research evidence.' },
     [PSCustomObject]@{ Path = 'artifacts'; Category = 'generated'; Note = 'Compiled/published outputs. Safe to regenerate.' },
-    [PSCustomObject]@{ Path = 'native/build'; Category = 'generated'; Note = 'CMake build tree. Safe to regenerate.' },
     [PSCustomObject]@{ Path = '.dotnet-home'; Category = 'local-cache'; Note = 'Project-local .NET/NuGet cache.' },
     [PSCustomObject]@{ Path = 'tools'; Category = 'local-third-party'; Note = 'Downloaded tools such as FModel/UE4SS.' },
-    [PSCustomObject]@{ Path = 'vendor'; Category = 'local-third-party/experiments'; Note = 'Dependency/template checkouts.' },
     [PSCustomObject]@{ Path = '.claude'; Category = 'local-tooling'; Note = 'Local assistant/tool metadata.' }
 )
 

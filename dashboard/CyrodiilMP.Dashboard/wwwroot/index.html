@@ -159,7 +159,7 @@
           <div class="panel__header">
             <div>
               <h2>Network Smoke</h2>
-              <p>Start the helper-managed server and run the short-lived client bridge smoke test.</p>
+              <p>Start and stop the helper-managed server.</p>
             </div>
           </div>
 
@@ -179,36 +179,6 @@
 
           <div id="server-summary" class="status-box">Server helper is not running.</div>
 
-          <div class="divider"></div>
-
-          <label class="field field--compact">
-            <span class="field__label">Bridge Host</span>
-            <input id="bridge-host-input" class="field__input" type="text" value="127.0.0.1">
-          </label>
-          <div class="field-grid">
-            <label class="field field--compact">
-              <span class="field__label">Bridge Port</span>
-              <input id="bridge-port-input" class="field__input" type="number" min="1" max="65535" value="27015">
-            </label>
-            <label class="field field--compact">
-              <span class="field__label">Timeout (ms)</span>
-              <input id="bridge-timeout-input" class="field__input" type="number" min="100" value="1800">
-            </label>
-          </div>
-          <div class="field-grid">
-            <label class="field field--compact">
-              <span class="field__label">Bridge Name</span>
-              <input id="bridge-name-input" class="field__input" type="text" value="DashboardBridge">
-            </label>
-            <label class="field field--compact">
-              <span class="field__label">Reason</span>
-              <input id="bridge-reason-input" class="field__input" type="text" value="dashboard-smoke">
-            </label>
-          </div>
-
-          <div class="button-row">
-            <button id="bridge-run-button" class="ghost-button" type="button">Run Client Bridge</button>
-          </div>
         </section>
 
         <section class="panel">

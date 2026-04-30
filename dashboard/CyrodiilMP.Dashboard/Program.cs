@@ -174,27 +174,6 @@ app.MapPost("/api/actions/analyze-runtime-dump", (AnalyzeDumpRequest request) =>
             ("-DumpPath", dumpPath)));
 });
 
-app.MapPost("/api/actions/client-bridge", (ClientBridgeRequest request) =>
-{
-    var hostName = string.IsNullOrWhiteSpace(request.HostName) ? CyrodiilProtocol.DefaultHost : request.HostName.Trim();
-    var port = request.Port ?? CyrodiilProtocol.DefaultPort;
-    var name = string.IsNullOrWhiteSpace(request.Name) ? "DashboardBridge" : request.Name.Trim();
-    var reason = string.IsNullOrWhiteSpace(request.Reason) ? "dashboard-smoke" : request.Reason.Trim();
-    var timeoutMs = request.TimeoutMs is > 0 ? request.TimeoutMs.Value : 1800;
-
-    return StartDashboardJob(
-        root,
-        jobState,
-        "Client bridge smoke test",
-        Path.Combine(root, "scripts", "run-client-bridge.ps1"),
-        BuildNamedArgs(
-            ("-HostName", hostName),
-            ("-Port", port.ToString()),
-            ("-Name", name),
-            ("-Reason", reason),
-            ("-TimeoutMs", timeoutMs.ToString())));
-});
-
 app.MapGet("/api/runs/{runId}", (string runId) =>
 {
     var runPath = GetRunPath(root, runId);
@@ -945,7 +924,6 @@ record GamePathRequest(string? GamePath);
 record NameRequest(string? Name);
 record NamedGamePathRequest(string? Name, string? GamePath);
 record AnalyzeDumpRequest(string? DumpId);
-record ClientBridgeRequest(string? HostName, int? Port, string? Name, string? Reason, int? TimeoutMs);
 record ServerStartRequest(int? Port);
 record GamePathUpdateRequest(string? GamePath);
 

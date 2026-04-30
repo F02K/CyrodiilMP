@@ -72,12 +72,6 @@ const els = {
   serverStopButton: document.querySelector("#server-stop-button"),
   serverForceStopButton: document.querySelector("#server-force-stop-button"),
   serverSummary: document.querySelector("#server-summary"),
-  bridgeHostInput: document.querySelector("#bridge-host-input"),
-  bridgePortInput: document.querySelector("#bridge-port-input"),
-  bridgeTimeoutInput: document.querySelector("#bridge-timeout-input"),
-  bridgeNameInput: document.querySelector("#bridge-name-input"),
-  bridgeReasonInput: document.querySelector("#bridge-reason-input"),
-  bridgeRunButton: document.querySelector("#bridge-run-button"),
   cancelJobButton: document.querySelector("#cancel-job-button"),
   currentJobSummary: document.querySelector("#current-job-summary"),
   recentJobs: document.querySelector("#recent-jobs"),
@@ -120,7 +114,6 @@ els.analyzeSelectedDumpButton.addEventListener("click", () => analyzeSelectedDum
 els.serverStartButton.addEventListener("click", () => startServer());
 els.serverStopButton.addEventListener("click", () => stopServer());
 els.serverForceStopButton.addEventListener("click", () => forceStopServer());
-els.bridgeRunButton.addEventListener("click", () => runBridgeSmoke());
 els.cancelJobButton.addEventListener("click", () => cancelCurrentJob());
 applyTheme(state.theme, { persist: false });
 
@@ -336,7 +329,6 @@ function updateActionButtons() {
   els.fullResearchButton.disabled = jobRunning;
   els.createNoteRunButton.disabled = jobRunning;
   els.collectDumpButton.disabled = jobRunning;
-  els.bridgeRunButton.disabled = jobRunning;
   els.cancelJobButton.disabled = !jobRunning;
   els.analyzeSelectedDumpButton.disabled = jobRunning || state.selection.scope !== "runtime";
   els.serverStartButton.disabled = serverRunning;
@@ -618,16 +610,6 @@ async function forceStopServer() {
   } catch (error) {
     showFlash(getErrorMessage(error), "error");
   }
-}
-
-async function runBridgeSmoke() {
-  await runDashboardAction("/api/actions/client-bridge", {
-    hostName: els.bridgeHostInput.value.trim(),
-    port: Number.parseInt(els.bridgePortInput.value, 10) || 27015,
-    name: els.bridgeNameInput.value.trim(),
-    reason: els.bridgeReasonInput.value.trim(),
-    timeoutMs: Number.parseInt(els.bridgeTimeoutInput.value, 10) || 1800
-  }, "Client bridge smoke test started.");
 }
 
 async function cancelCurrentJob() {

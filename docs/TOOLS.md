@@ -10,15 +10,13 @@
 - **Asset Registry tools** - map cooked asset names, dependencies, and package structure.
 - **Bethesda data inspection tools** - keep TES4Edit/xEdit-style workflows in research if Remastered retains classic records beneath the UE5 presentation layer.
 
-## Native Integration
+## UE4SS Runtime Integration
 
-- **Visual Studio 2022** - C/C++ development, Windows debugging, native plugin builds.
-- **CMake** - cross-IDE native build configuration.
-- **vcpkg** - dependency management for C++ libraries.
+- **Visual Studio 2022** - C++ development and Windows debugging for the `RE-UE4SS` fork.
+- **UE4SS Lua** - game-side orchestration and runtime inspection.
 - **x64dbg** - runtime debugging and reverse engineering.
 - **Ghidra** - static reverse engineering and binary analysis.
 - **ReClass.NET** - inspect and document runtime memory structures.
-- **Microsoft Detours / MinHook** - function hooking experiments.
 - **Unreal Engine SDK dumps** - document reflected classes, functions, properties, components, and network-relevant runtime objects.
 
 ## Networking And Server
@@ -52,7 +50,7 @@
 For an early prototype, start with:
 
 - UE5 package inspection with FModel, UnrealPak/IoStore tools, and SDK-dump research.
-- C++ with Visual Studio and CMake for native runtime integration.
+- C++ inside the `RE-UE4SS` fork for runtime helpers exposed to Lua.
 - C#/.NET or Rust for the authoritative server.
 - MessagePack or Protocol Buffers for network messages.
 - LiteNetLib, ENet, or Steam Networking Sockets for UDP-style transport.
