@@ -1,43 +1,40 @@
 # Project Structure
 
-CyrodiilMP is still early, so the most important rule is to keep experiments from hardening into one giant file. This is the current ownership map.
+CyrodiilMP has one game-runtime path now: extend the `F02K/RE-UE4SS` fork and
+drive game behavior from Lua.
 
-## Runtime Pieces
+## Active Runtime Pieces
 
-- `server/` - dedicated server prototype and packet capture. This should stay game-agnostic.
-- `shared/` - protocol models, serialization, constants, and anything used by both server and clients.
-- `native/CyrodiilMP.GameClient/` - native client networking/runtime helper DLL. This owns server connection behavior, command watching, and later transform send/receive calls exposed to the game runtime.
-- `native/CyrodiilMP.Bootstrap/` - injected standalone DLL. This owns process startup, settings, UE runtime discovery, and loading `CyrodiilMP.GameClient.dll`.
-- `native/CyrodiilMP.Launcher/` - small process launcher/injector. This should stay dumb and not contain game logic.
-- `game-plugin/UE4SS/` - research/dumper-only UE4SS Lua assets. This should not own runtime loading, UI, networking, or final gameplay behavior.
+- `RE-UE4SS/` - direct submodule and primary C++ runtime base.
+- `game-plugin/UE4SS/Mods/` - Lua mods copied into the game `Mods` folder.
+- `server/` - authoritative dedicated server prototype.
+- `shared/` - protocol contracts shared by server and tools.
+- `dashboard/` - local web dashboard for setup, research, install, and server helpers.
 
-## Bootstrap Source Layout
+## UE4SS Boundary
 
-- `Bootstrap.cpp` - lifecycle orchestration: derive paths, load settings, initialize UEBridge, load GameClient.
-- `Settings.*` - bootstrap settings file creation and parsing.
-- `Log.*` - file logging.
-- `PatternScanner.*` - generic PE section and byte-pattern scanner. It should not know about Unreal names.
-- `UEPatterns.*` - Oblivion Remastered UE5.3 pattern definitions.
-- `UEBridge.*` - UE-facing coordinator: module snapshot, pattern scan execution, JSON/log reporting, later UWorld/pawn helpers.
-- `DllMain.cpp` - minimal DLL attach/detach entry point only.
+- UE4SS C++ owns low-level UE access, function registration, native networking glue, and unsafe engine calls.
+- Lua owns orchestration: connect/disconnect, tick/update scheduling, debug commands, and calls to safe C++ helpers.
+- The server remains outside the game process and owns session state.
 
-## Near-Term Refactor Targets
+## First Lua API Targets
 
-- Move UE address results into a typed `UEAddresses` struct once the scanner reliably completes.
-- Keep raw pattern definitions in `UEPatterns.*`; do not scatter signatures through gameplay code.
-- Add a separate `UEObjectRuntime.*` when we start reading `GUObjectArray`, names, objects, worlds, or pawns.
-- Add a separate `PlayerTransformProbe.*` for local pawn transform reads before connecting that data to networking.
-- Keep UI work out of the transform-sync path. Menu or overlay work should live in an owned native module under the launcher/bootstrap path after the player-position MVP is stable.
+- `CyrodiilMP.Connect(host, port, displayName)`
+- `CyrodiilMP.Disconnect()`
+- `CyrodiilMP.IsConnected()`
+- `CyrodiilMP.GetLocalPlayerTransform()`
+- `CyrodiilMP.SendLocalPlayerTransform(transform)`
+- `CyrodiilMP.PollRemotePlayerUpdates()`
+- `CyrodiilMP.SpawnRemotePlayerProxy(playerId, transform)`
+- `CyrodiilMP.UpdateRemotePlayerProxy(playerId, transform)`
+- `CyrodiilMP.DespawnRemotePlayerProxy(playerId)`
 
-## Current MVP Flow
+## MVP Flow
 
 ```text
-CyrodiilMP.Launcher.exe
-  -> injects CyrodiilMP.Bootstrap.dll
-      -> reads Bootstrap/settings.ini
-      -> scans UE runtime anchors
-      -> loads CyrodiilMP.GameClient.dll
-          -> connects to dedicated server sidecar
+Oblivion Remastered
+  -> loads RE-UE4SS
+      -> registers CyrodiilMP C++ helpers into Lua
+          -> CyrodiilMP Lua mod connects to the dedicated server
+          -> Lua calls C++ helpers for local/remote player state
 ```
-
-The first real gameplay milestone is still: read local player transform, send it to the server, receive another player transform, and render or update a remote representation in-game.

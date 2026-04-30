@@ -24,7 +24,7 @@ if (-not (Test-Path -LiteralPath $targetGameRoot -PathType Container)) {
 }
 
 if (-not ((Test-Path -LiteralPath $targetWin64Path -PathType Container) -or (Test-Path -LiteralPath $targetPaksPath -PathType Container))) {
-    throw "Game path does not look complete enough for UE4SS research helper install. Expected either $targetWin64Path or $targetPaksPath to exist."
+        throw "Game path does not look complete enough for UE4SS Lua mod install. Expected either $targetWin64Path or $targetPaksPath to exist."
 }
 
 New-Item -ItemType Directory -Path $targetWin64Path -Force | Out-Null
@@ -62,7 +62,7 @@ foreach ($modName in $modsToInstall) {
     if (-not (Test-Path -LiteralPath $modEnabledPath -PathType Leaf)) {
         New-Item -ItemType File -Path $modEnabledPath -Force | Out-Null
     }
-    Write-Host "Installed UE4SS research helper $modName -> $target"
+    Write-Host "Installed UE4SS Lua mod $modName -> $target"
 }
 
 if (Test-Path -LiteralPath $modsListPath -PathType Leaf) {
@@ -102,14 +102,14 @@ foreach ($retiredMod in $retiredRuntimeMods) {
 }
 
 Write-Host ''
-Write-Host 'Installed CyrodiilMP UE4SS research helpers.'
-Write-Host 'UE4SS is used only for dumps/runtime inspection; gameplay, UI, and networking belong to the standalone launcher/bootstrap path.'
+Write-Host 'Installed CyrodiilMP UE4SS Lua mods.'
+Write-Host 'RE-UE4SS is the runtime base; C++ gameplay helpers should be exposed to these Lua mods.'
 Write-Host 'Runtime dumps should appear in:'
 Write-Host $runtimeDumpPath
 Write-Host 'Menu probe dumps should appear in:'
 Write-Host $menuProbePath
 Write-Host ''
-Write-Host 'Installed research helpers:'
+Write-Host 'Installed Lua mods:'
 foreach ($modName in $modsToInstall) {
     Write-Host "  $modName"
 }

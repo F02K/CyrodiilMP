@@ -7,8 +7,6 @@ $root = Resolve-Path (Join-Path $PSScriptRoot '..')
 $projects = @(
     'shared\CyrodiilMP.Protocol\CyrodiilMP.Protocol.csproj',
     'server\CyrodiilMP.Server\CyrodiilMP.Server.csproj',
-    'client\CyrodiilMP.ClientBridge\CyrodiilMP.ClientBridge.csproj',
-    'tests\CyrodiilMP.NetProbe\CyrodiilMP.NetProbe.csproj',
     'dashboard\CyrodiilMP.Dashboard\CyrodiilMP.Dashboard.csproj'
 )
 

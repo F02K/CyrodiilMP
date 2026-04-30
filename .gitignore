@@ -43,7 +43,6 @@ coverage/
 # CMake / native builds
 build/*
 !build/*.ps1
-native/build/
 out/
 cmake-build-*/
 CMakeFiles/
@@ -100,15 +99,6 @@ research/runs/*/screenshots/
 tools/**
 !tools/
 !tools/README.md
-vendor/**
-!vendor/
-!vendor/README.md
-!vendor/NirnLabUIPlatformOR
-!vendor/NirnLabUIPlatformOR/
-!vendor/NirnLabUIPlatformOR/**
-!vendor/vcpkg
-!vendor/vcpkg/
-!vendor/vcpkg/**
 
 # Unreal Engine / cooked game content / mod package outputs
 Saved/

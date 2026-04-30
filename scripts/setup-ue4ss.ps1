@@ -6,9 +6,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = Resolve-Path (Join-Path $PSScriptRoot '..')
-$vendorRoot = Join-Path $projectRoot 'vendor'
-$ue4ssRoot = Join-Path $vendorRoot 'RE-UE4SS'
-$repoUrl = 'https://github.com/UE4SS-RE/RE-UE4SS.git'
+$ue4ssRoot = Join-Path $projectRoot 'RE-UE4SS'
+$repoUrl = 'https://github.com/F02K/RE-UE4SS.git'
 
 function Invoke-CheckedGit {
     param(
@@ -41,13 +40,11 @@ Could not initialize RE-UE4SS submodules.
 RE-UE4SS depends on Unreal pseudo-source access. Link your GitHub account to your Epic Games account, make sure the same GitHub credentials are available to git, then rerun this script.
 
 If you do not use GitHub SSH keys, rerun with:
-  .\scripts\setup-native-deps.cmd -UseHttpsSubmodules
+  .\scripts\setup-ue4ss.cmd -UseHttpsSubmodules
 
-RE-UE4SS is no longer part of the CyrodiilMP native runtime build. Keep this checkout only for historical UE4SS C++ research.
+RE-UE4SS is the CyrodiilMP runtime base now. Fix this dependency inside the F02K fork before adding another runtime path.
 '@
 }
-
-New-Item -ItemType Directory -Path $vendorRoot -Force | Out-Null
 
 if (Test-Path -LiteralPath (Join-Path $ue4ssRoot 'CMakeLists.txt') -PathType Leaf) {
     Write-Host "RE-UE4SS already exists: $ue4ssRoot"
@@ -56,12 +53,12 @@ if (Test-Path -LiteralPath (Join-Path $ue4ssRoot 'CMakeLists.txt') -PathType Lea
 }
 elseif ($AsSubmodule) {
     Write-Host "Adding RE-UE4SS as a git submodule..."
-    Invoke-CheckedGit -Arguments @('-C', $projectRoot, 'submodule', 'add', $repoUrl, 'vendor/RE-UE4SS') `
+    Invoke-CheckedGit -Arguments @('-C', $projectRoot, 'submodule', 'add', $repoUrl, 'RE-UE4SS') `
         -FailureMessage 'Could not add RE-UE4SS submodule'
     Update-Ue4ssSubmodules -Path $ue4ssRoot
 }
 else {
-    Write-Host "Cloning RE-UE4SS into vendor folder..."
+    Write-Host "Cloning RE-UE4SS into the repository root..."
     Invoke-CheckedGit -Arguments @('clone', $repoUrl, $ue4ssRoot) `
         -FailureMessage 'Could not clone RE-UE4SS'
     Update-Ue4ssSubmodules -Path $ue4ssRoot
@@ -81,7 +78,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $ue4ssRoot 'CMakeLists.txt') -PathTy
 }
 
 Write-Host ''
-Write-Host 'RE-UE4SS research checkout setup complete.'
+Write-Host 'RE-UE4SS runtime checkout setup complete.'
 Write-Host "UE4SS_ROOT: $ue4ssRoot"
 Write-Host ''
-Write-Host 'Note: CyrodiilMP runtime builds no longer consume this checkout.'
+Write-Host 'Note: CyrodiilMP should extend this fork with C++ functions exposed to Lua.'

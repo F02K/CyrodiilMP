@@ -1,58 +1,59 @@
 # CyrodiilMP
 
-CyrodiilMP is an experimental multiplayer mod project for The Elder Scrolls IV: Oblivion Remastered, targeting its Unreal Engine 5 runtime.
+CyrodiilMP is an experimental multiplayer mod project for The Elder Scrolls IV:
+Oblivion Remastered.
+
+## Runtime Direction
+
+CyrodiilMP is based on a direct `F02K/RE-UE4SS` submodule. The game-facing client
+runtime should be implemented by extending that UE4SS fork with C++ functions
+exposed to Lua.
+
+Lua mods under `game-plugin/UE4SS/Mods` orchestrate the game-side behavior. The
+dedicated server and shared protocol code stay outside the game process.
 
 ## MVP Goal
 
-Run a dedicated CyrodiilMP server that multiple clients can connect to, then show another connected player in-game with their position synced.
+Run a dedicated CyrodiilMP server that multiple clients can connect to, then show
+another connected player in-game with their position synced.
 
 The first playable milestone is intentionally small:
 
 - Start a dedicated server outside the game.
-- Connect two Oblivion Remastered clients to that server.
+- Connect two Oblivion Remastered clients through the UE4SS-based runtime.
 - Spawn a remote player representation in the same area.
 - Sync position, rotation, movement state, display name, and basic spawn/despawn.
-- Keep combat, quests, inventory, NPCs, world changes, and persistence out of scope until the movement prototype is reliable.
+- Keep combat, quests, inventory, NPCs, world changes, and persistence out of scope until movement is reliable.
 
-## Initial Layout
+## Layout
 
-- `docs/` - design notes, tool choices, architecture decisions.
-- `research/` - reverse engineering notes, UE5 runtime notes, packet/state sync experiments.
-- `client/` - retired/experimental managed bridge used by early menu-connect smoke tests.
-- `game-plugin/` - Remastered-side mod/plugin assets, UE project notes, pak/mod packaging experiments.
-- `native/` - standalone native GameClient DLL plus owned launcher/bootstrap loader.
+- `RE-UE4SS/` - direct submodule for the Oblivion Remastered UE4SS runtime fork.
+- `game-plugin/UE4SS/Mods/` - CyrodiilMP Lua mods installed into the game `Mods` folder.
 - `server/` - authoritative multiplayer server prototype.
-- `shared/` - protocol schemas, shared constants, serialization formats.
-- `scripts/` - build, packaging, and developer utility scripts.
-- `tests/` - automated tests and simulation harnesses.
+- `shared/` - protocol schemas, constants, and shared serialization code.
+- `dashboard/` - local browser dashboard for research/install/server helpers.
+- `scripts/` - build, setup, research, dashboard, server, and UE4SS Lua install helpers.
+- `docs/` - current architecture and workflow notes.
+- `research/` - local investigation notes and generated research outputs.
 
-## First Data Helpers
-
-Use the helper scripts to collect initial UE5/game-folder data without modifying the game install:
+## Common Commands
 
 ```powershell
+.\scripts\setup-ue4ss.cmd
+.\scripts\build.cmd -Configuration Debug
 .\scripts\run-dashboard.cmd -Port 5088
-.\scripts\quick-scan.cmd -GamePath "D:\SteamLibrary\steamapps\common\Oblivion Remastered"
-.\scripts\full-research.cmd -GamePath "D:\SteamLibrary\steamapps\common\Oblivion Remastered"
-.\scripts\open-fmodel.cmd
-.\scripts\new-research-run.cmd -Name "first-fmodel-pass"
-.\scripts\index-fmodel-export.cmd -ExportPath "D:\FModelExports\OblivionMenu" -Name main-menu-pass
-.\scripts\install-cyrodiilmp-ue4ss-mods.cmd
+.\scripts\run-server.cmd -Port 27015
+.\scripts\install-cyrodiilmp-ue4ss-mods.cmd -GamePath "D:\SteamLibrary\steamapps\common\Oblivion Remastered"
 ```
 
-UE4SS helpers are research/dumper tooling only. See `scripts/README.md` for the full helper list, `docs/PROJECT_STRUCTURE.md` for runtime ownership boundaries, `docs/REPOSITORY_ORGANIZATION.md` for the repo cleanup map, `docs/STANDALONE_LOADER.md` for the owned native loader path, `docs/NATIVE_GAMECLIENT.md` for the standalone native GameClient, and `docs/UE4SS_RESEARCH.md` for UE4SS scope.
+The helper scripts accept `-GamePath`, `CYRODIILMP_GAME_DIR`, or the local
+`game-path.txt` file.
 
 ## License And Rights
 
-CyrodiilMP's original code and documentation are released under the MIT License. See `LICENSE`.
+CyrodiilMP's original code and documentation are released under the MIT License.
+See `LICENSE`.
 
-This does not grant rights to Oblivion Remastered, Bethesda/Microsoft/ZeniMax materials, Unreal Engine/Epic materials, game assets, trademarks, third-party tools, or extracted proprietary content. See `NOTICE.md`.
-
-## Early Technical Questions
-
-- What state should be authoritative on the server?
-- Which player state should sync first: transform, animation, health, inventory, world cells, quests?
-- Will the client integration be a UE5 plugin/mod, a native runtime hook, a launcher-assisted injector, or a mix?
-- How should UE5 pak/mod loading, asset conflicts, and any retained Bethesda data formats be handled?
-- What is the minimum playable prototype: seeing another player move in the same exterior cell through the dedicated server is the first milestone.
-- Which systems still live in legacy Oblivion-style data, and which systems are exposed through UE5 objects, Blueprints, components, or subsystems?
+This does not grant rights to Oblivion Remastered, Bethesda/Microsoft/ZeniMax
+materials, Unreal Engine/Epic materials, game assets, trademarks, third-party
+tools, or extracted proprietary content. See `NOTICE.md`.

@@ -1,33 +1,20 @@
 # UE4SS Mods
 
-## CyrodiilMP_AutoUSMAP
-
-This tiny UE4SS Lua mod calls `DumpUSMAP()` automatically after the game starts, so no hotkey is required.
-
-Copy:
+CyrodiilMP Lua mods live here and are installed into:
 
 ```text
-game-plugin\UE4SS\Mods\CyrodiilMP_AutoUSMAP
+OblivionRemastered\Binaries\Win64\Mods
 ```
 
-Into:
+Install them with:
 
-```text
-F:\Steam\steamapps\common\Oblivion Remastered\OblivionRemastered\Binaries\Win64\Mods\CyrodiilMP_AutoUSMAP
+```powershell
+.\scripts\install-cyrodiilmp-ue4ss-mods.cmd -GamePath "D:\SteamLibrary\steamapps\common\Oblivion Remastered"
 ```
 
-Then add this line to:
+Current mods:
 
-```text
-F:\Steam\steamapps\common\Oblivion Remastered\OblivionRemastered\Binaries\Win64\Mods\enabled.txt
-```
+- `CyrodiilMP_RuntimeInspector` - runtime object/menu dump helper.
+- `CyrodiilMP_AutoUSMAP` - optional helper that calls `DumpUSMAP()` after launch.
 
-```text
-CyrodiilMP_AutoUSMAP
-```
-
-Start the game, wait about 12 seconds after UE4SS loads, then check:
-
-```text
-F:\Steam\steamapps\common\Oblivion Remastered\OblivionRemastered\Binaries\Win64\Mappings.usmap
-```
+Future gameplay Lua should call C++ helpers registered by the `RE-UE4SS` fork.

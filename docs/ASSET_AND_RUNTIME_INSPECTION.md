@@ -1,6 +1,7 @@
 # Asset And Runtime Inspection
 
-CyrodiilMP needs two kinds of references before we can safely add a main-menu `Connect` button in our owned launcher/bootstrap UI path:
+CyrodiilMP needs two kinds of references before we can safely add game-facing
+multiplayer behavior through UE4SS and Lua:
 
 - Offline asset references from FModel exports.
 - Runtime object/widget references from UE4SS while the game is running.
@@ -25,7 +26,7 @@ Output goes to `research/fmodel-index/`.
 
 ## Runtime Inspector
 
-Install the UE4SS research helpers:
+Install the UE4SS Lua helpers:
 
 ```powershell
 .\scripts\install-cyrodiilmp-ue4ss-mods.cmd
@@ -69,4 +70,6 @@ The old UE4SS connect prototype registered:
 cyro_connect
 ```
 
-That prototype is retired. Use the runtime dumps to identify the main-menu widget/class/function names, then route the real visible button through the standalone launcher/bootstrap UI path instead of a UE4SS runtime mod.
+That prototype was removed with the legacy client path. Use runtime dumps to
+identify the main-menu widget/class/function names, then route the real visible
+button through the UE4SS C++ API exposed to Lua.
