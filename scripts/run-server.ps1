@@ -1,5 +1,6 @@
 param(
-    [int]$Port = 27015
+    [int]$Port = 27015,
+    [int]$NativePort = 27016
 )
 
 $ErrorActionPreference = 'Stop'
@@ -11,4 +12,4 @@ $env:APPDATA = Join-Path $root '.dotnet-home\AppData\Roaming'
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
 New-Item -ItemType Directory -Path $env:APPDATA -Force | Out-Null
 
-dotnet run --project $serverProject --no-restore -- --port $Port
+dotnet run --project $serverProject --no-restore -- --port $Port --native-port $NativePort

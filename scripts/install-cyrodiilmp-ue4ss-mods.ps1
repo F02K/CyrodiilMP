@@ -33,6 +33,7 @@ New-Item -ItemType Directory -Path $runtimeDumpPath -Force | Out-Null
 New-Item -ItemType Directory -Path $menuProbePath -Force | Out-Null
 
 $modsToInstall = @(
+    'CyrodiilMP_MultiplayerPrototype',
     'CyrodiilMP_RuntimeInspector'
 )
 

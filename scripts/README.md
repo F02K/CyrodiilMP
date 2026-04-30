@@ -39,12 +39,42 @@ Builds the shared protocol library, server, and dashboard.
 .\scripts\build.cmd -Configuration Debug
 ```
 
+Builds the `F02K/RE-UE4SS` fork and checks that the runtime DLLs were produced.
+This currently requires the nested `deps/first/Unreal` pseudo-source checkout to
+exist and be accessible.
+
+```powershell
+.\scripts\build-ue4ss.cmd -Configuration Release
+```
+
+Protocol smoke for the raw UDP v0 sidecar:
+
+```powershell
+.\scripts\test-udp-sidecar.cmd -Port 27016
+```
+
 ## Server
 
 Starts the local dedicated server helper.
 
 ```powershell
 .\scripts\run-server.cmd -Port 27015
+```
+
+The server starts the raw UDP sidecar on port `27016` by default. Override it
+when needed:
+
+```powershell
+.\scripts\run-server.cmd -Port 27015 -NativePort 27016
+```
+
+## Install UE4SS Runtime
+
+Copies the built UE4SS runtime files and base UE4SS Mods folder into Oblivion
+Remastered `Binaries\Win64`.
+
+```powershell
+.\scripts\install-ue4ss-runtime.cmd -GamePath "D:\SteamLibrary\steamapps\common\Oblivion Remastered"
 ```
 
 ## Install UE4SS Lua Mods

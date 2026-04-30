@@ -4,7 +4,7 @@ using CyrodiilMP.Server;
 using LiteNetLib;
 
 var port = GetPort(args);
-var nativePort = GetNativePort(args, port + 1);
+var nativePort = GetNativePort(args, CyrodiilProtocol.DefaultNativeUdpPort);
 var playerIdCounter = 0;
 
 var listener = new EventBasedNetListener();

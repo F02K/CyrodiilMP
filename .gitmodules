@@ -1,3 +1,6 @@
 [submodule "RE-UE4SS"]
 	path = RE-UE4SS
 	url = https://github.com/F02K/RE-UE4SS.git
+[submodule "UE4SSCPPTemplate"]
+	path = UE4SSCPPTemplate
+	url = https://github.com/F02K/UE4SSCPPTemplate.git

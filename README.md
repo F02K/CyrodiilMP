@@ -12,6 +12,9 @@ exposed to Lua.
 Lua mods under `game-plugin/UE4SS/Mods` orchestrate the game-side behavior. The
 dedicated server and shared protocol code stay outside the game process.
 
+`UE4SSCPPTemplate/` is kept as a top-level reference/probe submodule only. The
+v0 runtime path is the extended `RE-UE4SS` core plus Lua mods.
+
 ## MVP Goal
 
 Run a dedicated CyrodiilMP server that multiple clients can connect to, then show
@@ -28,6 +31,7 @@ The first playable milestone is intentionally small:
 ## Layout
 
 - `RE-UE4SS/` - direct submodule for the Oblivion Remastered UE4SS runtime fork.
+- `UE4SSCPPTemplate/` - reference/probe submodule for UE4SS C++ mod structure.
 - `game-plugin/UE4SS/Mods/` - CyrodiilMP Lua mods installed into the game `Mods` folder.
 - `server/` - authoritative multiplayer server prototype.
 - `shared/` - protocol schemas, constants, and shared serialization code.
@@ -41,8 +45,11 @@ The first playable milestone is intentionally small:
 ```powershell
 .\scripts\setup-ue4ss.cmd
 .\scripts\build.cmd -Configuration Debug
+.\scripts\build-ue4ss.cmd -Configuration Release
 .\scripts\run-dashboard.cmd -Port 5088
 .\scripts\run-server.cmd -Port 27015
+.\scripts\test-udp-sidecar.cmd -Port 27016
+.\scripts\install-ue4ss-runtime.cmd -GamePath "D:\SteamLibrary\steamapps\common\Oblivion Remastered"
 .\scripts\install-cyrodiilmp-ue4ss-mods.cmd -GamePath "D:\SteamLibrary\steamapps\common\Oblivion Remastered"
 ```
 

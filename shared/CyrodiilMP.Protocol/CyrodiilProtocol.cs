@@ -7,18 +7,36 @@ public static class CyrodiilProtocol
 {
     public const string ConnectionKey = "CyrodiilMP";
     public const int DefaultPort = 27015;
+    public const int DefaultNativeUdpPort = 27016;
     public const string DefaultHost = "127.0.0.1";
     public const int ProtocolVersion = 0;
     public const int DefaultServerTickRate = 15;
 
+    public static byte[] CreateHello(string name)
+    {
+        return Utf8($"hello protocol={ProtocolVersion} name={Escape(name)}");
+    }
+
     public static byte[] CreateHello(string name, string source)
     {
-        return Utf8($"hello name={Escape(name)} source={Escape(source)} protocol={ProtocolVersion}");
+        return CreateHello(name);
     }
 
     public static byte[] CreateMenuConnectRequest(string name, string reason)
     {
         return Utf8($"menu-connect name={Escape(name)} reason={Escape(reason)}");
+    }
+
+    public static byte[] CreateTransform(
+        int playerId,
+        int tick,
+        float x,
+        float y,
+        float z,
+        float yaw)
+    {
+        return Utf8(FormattableString.Invariant(
+            $"transform player={playerId} tick={tick} x={x:0.00} y={y:0.00} z={z:0.00} yaw={yaw:0.00}"));
     }
 
     public static byte[] CreateTransform(
@@ -35,7 +53,30 @@ public static class CyrodiilProtocol
 
     public static byte[] CreateServerWelcome(int playerId, int tickRate)
     {
-        return Utf8($"server-welcome player={playerId} tick_rate={tickRate} protocol={ProtocolVersion}");
+        return Utf8($"server-welcome protocol={ProtocolVersion} player={playerId} tick_rate={tickRate}");
+    }
+
+    public static byte[] CreateRemoteTransform(
+        int playerId,
+        string name,
+        int tick,
+        float x,
+        float y,
+        float z,
+        float yaw)
+    {
+        return Utf8(FormattableString.Invariant(
+            $"remote-transform player={playerId} name={Escape(name)} tick={tick} x={x:0.00} y={y:0.00} z={z:0.00} yaw={yaw:0.00}"));
+    }
+
+    public static byte[] CreateDisconnect(int playerId)
+    {
+        return Utf8($"disconnect player={playerId}");
+    }
+
+    public static byte[] CreatePlayerLeft(int playerId, string reason)
+    {
+        return Utf8($"player-left player={playerId} reason={Escape(reason)}");
     }
 
     public static byte[] CreateMenuConnectAck(int playerId, string status)
