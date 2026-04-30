@@ -66,9 +66,16 @@ if ($Clean -and (Test-Path -LiteralPath $buildRoot -PathType Container)) {
 New-Item -ItemType Directory -Path $buildRoot -Force | Out-Null
 New-Item -ItemType Directory -Path $packageRoot -Force | Out-Null
 
-$legacyDllPath = Join-Path $packageRoot 'NirnLabUIPlatform.dll'
-if (Test-Path -LiteralPath $legacyDllPath -PathType Leaf) {
-    Remove-Item -LiteralPath $legacyDllPath -Force
+$obsoleteDlls = @(
+    'NirnLabUIPlatform.dll',
+    'NirnLabUIPlugin.dll',
+    'NirnLabUIPlatformTest.dll'
+)
+foreach ($obsoleteDll in $obsoleteDlls) {
+    $obsoleteDllPath = Join-Path $packageRoot $obsoleteDll
+    if (Test-Path -LiteralPath $obsoleteDllPath -PathType Leaf) {
+        Remove-Item -LiteralPath $obsoleteDllPath -Force
+    }
 }
 
 Write-Host "Building NirnLabUIPlatformOR ($Configuration)..."

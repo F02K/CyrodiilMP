@@ -112,9 +112,16 @@ if (Test-Path -LiteralPath $sourceUiPath -PathType Container) {
 }
 
 if (Test-Path -LiteralPath (Join-Path $sourceNirnLabPath 'NirnLabUIPlatformOR.dll') -PathType Leaf) {
-    $legacyTargetNirnLabDll = Join-Path $targetNirnLabPath 'NirnLabUIPlatform.dll'
-    if (Test-Path -LiteralPath $legacyTargetNirnLabDll -PathType Leaf) {
-        Remove-Item -LiteralPath $legacyTargetNirnLabDll -Force
+    $obsoleteTargetNirnLabDlls = @(
+        'NirnLabUIPlatform.dll',
+        'NirnLabUIPlugin.dll',
+        'NirnLabUIPlatformTest.dll'
+    )
+    foreach ($obsoleteTargetNirnLabDll in $obsoleteTargetNirnLabDlls) {
+        $obsoleteTargetNirnLabDllPath = Join-Path $targetNirnLabPath $obsoleteTargetNirnLabDll
+        if (Test-Path -LiteralPath $obsoleteTargetNirnLabDllPath -PathType Leaf) {
+            Remove-Item -LiteralPath $obsoleteTargetNirnLabDllPath -Force
+        }
     }
 
     Copy-Item -Path (Join-Path $sourceNirnLabPath '*') -Destination $targetNirnLabPath -Recurse -Force
